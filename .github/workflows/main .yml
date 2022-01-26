@@ -1,0 +1,74 @@
+# This GitHub Actions workflow contains two jobs:
+# -- First, Lint uses the latest Ubuntu image and Python 3.8 to check the code
+# and writing for defects, using poetry and its installed packages as well as mdl
+#
+# -- Second, Test using pytest
+name: Lint and Test
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Python 3.9.6
+        uses: actions/setup-python@v2
+        id: setup-python
+        with:
+          python-version: 3.9.6
+      - name: Setup poetry
+        uses: Gr1N/setup-poetry@v7
+      - name: Install dependencies
+        run: poetry install
+      - name: Run black
+        if: always()
+        run: poetry run task black
+      - name: Run flake8
+        if: always()
+        run: poetry run task flake8
+      - name: Run pydocstyle
+        if: always()
+        run: poetry run task pydocstyle
+      - name: Run pylint
+        if: always()
+        run: poetry run task pylint
+      - name: Run mypy
+        if: always()
+        run: poetry run task mypy
+      - name: Lint writing
+        if: always()
+        uses: actionshub/markdownlint@main
+
+  test:
+      name: Test
+      runs-on: ubuntu-latest
+      strategy:
+        # Turning fail-fast off ensures the entire strategy matrix is allowed to
+        # run to completion, allowing detection of individual platform issues
+        # regardless of the status of the other platforms.
+        fail-fast: false
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v2
+        - name: Setup Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v2
+          id: setup-python
+          with:
+            python-version: 3.9.6
+        - name: Setup poetry
+          uses: Gr1N/setup-poetry@v7
+        - name: Install dependencies
+          run: poetry install
+        - name: Execute tests
+          run: poetry run task coverage
+        # - name: Upload Coverage
+        #   uses: codecov/codecov-action@v2
+        #   with:
+        #     token: ${{ secrets.CODECOV_TOKEN }}
+        #     files: ./coverage.xml
+        #     flags: unittests
+        #     fail_ci_if_error: true 
+        #     verbose: true

@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "afluent"
+version = "0.1.0"
+description = "Automated Fault Localization Plugin for Pytest"
+authors = ["Noor Buchi <buchin@allegheny.edu>"]
+
+[tool.poetry.scripts]
+afluent = "afluent.main:app"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+black = "^21.8b0"
+taskipy = "^1.8.1"
+flake8 = "^3.9.2"
+pydocstyle = "^6.1.1"
+pylint = "^2.10.2"
+mypy = "^0.910"
+
+[tool.taskipy.tasks]
+black = { cmd = "black afluent tests --check", help = "Run the black checks for source code format" }
+coverage = {cmd = "pytest -s -vv --cov-report term-missing --cov=afluent --cov-report xml --cov-branch"}
+flake8 = { cmd = "flake8 afluent tests", help = "Run the flake8 checks for source code documentation" }
+mypy = { cmd = "poetry run mypy afluent --show-error-codes", help = "Run the mypy type checker for potential type errors" }
+pydocstyle = { cmd = "pydocstyle afluent tests", help = "Run the pydocstyle checks for source code documentation" }
+pylint = { cmd = "pylint afluent tests", help = "Run the pylint checks for source code documentation" }
+test = { cmd = "pytest -x -s", help = "Run the pytest test suite" }
+test-verbose = { cmd = "pytest -x -s -vv", help = "Run the pytest test suite" }
+test-silent = { cmd = "pytest -x --show-capture=no", help = "Run the pytest test suite without showing output" }
+all = "task black && task flake8 && task pydocstyle && task mypy && task pylint && task test"
+lint = "task black && task flake8 && task pydocstyle && task mypy && task pylint"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
