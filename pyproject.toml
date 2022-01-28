@@ -12,6 +12,8 @@ python = "^3.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+pytest-sugar = "^0.9.4"
+pytest-cov = "^3.0.0"
 black = "^21.8b0"
 taskipy = "^1.8.1"
 flake8 = "^3.9.2"
