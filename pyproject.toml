@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "afluent"
-version = "0.1.0"
+version = "0.1.2"
 description = "Automated Fault Localization Plugin for Pytest"
 authors = ["Noor Buchi <buchin@allegheny.edu>"]
 license = "MIT"
