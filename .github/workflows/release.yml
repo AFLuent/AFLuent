@@ -1,8 +1,6 @@
 name: Release to PyPi
 on:
   push:
-    branches:
-      - 'main'
     tags:
       - "v*.*.*"
 jobs:
