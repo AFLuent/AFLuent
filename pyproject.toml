@@ -3,15 +3,21 @@ name = "afluent"
 version = "0.1.0"
 description = "Automated Fault Localization Plugin for Pytest"
 authors = ["Noor Buchi <buchin@allegheny.edu>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/noorbuchi/AFLuent"
+keywords = ["pytest", "plugin", "atuomated fault localization", "test covrage"]
+classifiers = ["Framework :: Pytest"]
 
-[tool.poetry.scripts]
-afluent = "afluent.main:app"
+[tool.poetry.plugins."pytest11"]
+afluent = "afluent.main"
 
 [tool.poetry.dependencies]
+pytest = "^5.2"
 python = "^3.9"
+coverage = "^6.3"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
 pytest-sugar = "^0.9.4"
 pytest-cov = "^3.0.0"
 black = "^21.8b0"
