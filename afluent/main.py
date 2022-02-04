@@ -1,15 +1,20 @@
-import coverage
-import json
-import pytest
+"""Define Pytest Hooks that run AFLuent."""
+
+import coverage  # type: ignore[import]
+import pytest  # type: ignore[import]
+
+from afluent import spectrum_parser
 
 
 @pytest.hookimpl()
 def pytest_sessionstart(session):
-    session.session_spectrum = dict()
+    """Create a session variable as empty dictionary to store coverage."""
+    session.session_spectrum = {}
 
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
+    """Calculate the coverage of each test case and add it to spectrum."""
     cov = coverage.Coverage()
     cov.start()
     yield
@@ -26,7 +31,8 @@ def pytest_pyfunc_call(pyfuncitem):
 
 
 @pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport(item):
+    """Store the outcome of the test case as passed, failed, or skipped."""
     outcome = yield
     if outcome.get_result().when == "call":
         item.session.session_spectrum[item.name][
@@ -35,6 +41,14 @@ def pytest_runtest_makereport(item, call):
 
 
 def pytest_sessionfinish(session, exitstatus):
-    with open("spectrum_data.json", "w+") as outfile:
-        json.dump(session.session_spectrum, outfile)
-    print("Spectrum report generated...")
+    """Perform the spectrum analysis if at least one test fails."""
+    # Tests passed exit status
+    if exitstatus == 0:
+        print("\nAll tests passed no need to diagnose using AFLuent.")
+    # some tests failed exit status
+    elif exitstatus == 1:
+        print("\nFailing tests detected. Diagnosing using AFLuent...")
+        full_spectrum = spectrum_parser.Spectrum(session.session_spectrum)
+        full_spectrum.generate_report()
+        # TODO: add the rest of the spectrum calls
+        print("Spectrum report generated...")
