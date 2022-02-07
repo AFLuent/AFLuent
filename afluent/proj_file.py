@@ -1,5 +1,6 @@
 """Create object oriented structure for files carrying line coverage information."""
 from afluent import line
+from typing import Dict
 
 
 class ProjFile:
@@ -12,12 +13,17 @@ class ProjFile:
             name (str): name of the file under test
         """
         self.name = name
-        self.lines = {}
+        self.lines: Dict[int, line.Line] = {}
 
-    def add_line(self, line: line.Line):
-        """Add a line to the self.lines based on the number of the line.add()
-
-        Args:
-            line (line.Line): Line object to add
-        """
-        self.lines[line.number] = line
+    def update_file(self, covered_lines: list, test_result: str, test_case_name: str):
+        for line_number in covered_lines:
+            if line_number not in self.lines:
+                self.lines[line_number] = line(self.name, line_number)
+            if test_result == "passed":
+                self.lines[line_number].passed_by.append(test_case_name)
+            elif test_result == "failed":
+                self.lines[line_number].failed_by.append(test_case_name)
+            elif test_result == "skipped":
+                self.lines[line_number].skipped_by.append(test_case_name)
+            else:
+                raise Exception(f"Unknown test result for {test_case_name}")
