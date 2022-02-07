@@ -19,8 +19,9 @@ class Line:
         """
         self.path = file_path
         self.number = line_num
-        self.failed_cover = 0
-        self.passed_cover = 0
+        self.passed_by = []
+        self.failed_by = []
+        self.skipped_by = []
         self.passed_total = 0
         self.failed_total = 0
         self.sus_scores = {
@@ -38,18 +39,18 @@ class Line:
         # TODO: refactor this a bit
         if method.lower() == TARAN:
             self.sus_scores[TARAN] = Line.tarantula(
-                self.failed_cover,
-                self.passed_cover,
+                len(self.failed_by),
+                len(self.passed_by),
                 self.passed_total,
                 self.failed_total,
             )
         elif method.lower() == OCHIAI:
             self.sus_scores[OCHIAI] = Line.ochiai(
-                self.failed_cover, self.passed_cover, self.failed_total
+                len(self.failed_by), len(self.passed_by), self.failed_total
             )
         elif method.lower() == DSTAR:
             self.sus_scores[DSTAR] = Line.dstar(
-                self.failed_cover, self.passed_cover, self.failed_total, power
+                len(self.failed_by), len(self.passed_by), self.failed_total, power
             )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
@@ -76,10 +77,11 @@ class Line:
         Returns:
             float: suspiciousness score using tarantula
         """
+        # TODO: handle division by zero
         score = (failed_cover / total_failed) / (
             (passed_cover / total_passed) + (failed_cover / total_failed)
         )
-        return score
+        return round(score, 4)
 
     @staticmethod
     def ochiai(failed_cover: int, passed_cover: int, total_failed: int) -> float:
@@ -93,8 +95,9 @@ class Line:
         Returns:
             float: suspiciousness score using ochiai
         """
+        # TODO: handle division by zero
         score = failed_cover / math.sqrt(total_failed * (passed_cover + failed_cover))
-        return score
+        return round(score, 4)
 
     @staticmethod
     def dstar(
@@ -111,6 +114,7 @@ class Line:
         Returns:
             float: suspiciousness score using dstar
         """
+        # TODO: handle division by zero
         uncovered_failed = total_failed - failed_cover
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
-        return score
+        return round(score, 4)
