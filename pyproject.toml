@@ -29,7 +29,7 @@ mypy = "^0.910"
 
 [tool.taskipy.tasks]
 black = { cmd = "black afluent tests --check", help = "Run the black checks for source code format" }
-coverage = {cmd = "pytest -s -vv --cov-report term-missing --cov=afluent --cov-report xml --cov-branch"}
+coverage = {cmd = "pytest -s -vv --cache-clear --cov-report term-missing --cov=afluent --cov-report xml --cov-branch"}
 flake8 = { cmd = "flake8 afluent tests", help = "Run the flake8 checks for source code documentation" }
 mypy = { cmd = "poetry run mypy afluent --show-error-codes", help = "Run the mypy type checker for potential type errors" }
 pydocstyle = { cmd = "pydocstyle afluent tests", help = "Run the pydocstyle checks for source code documentation" }
