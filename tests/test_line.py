@@ -1,4 +1,4 @@
-"""Test the line module and Line class"""
+"""Test the line module and Line class."""
 
 import pytest
 

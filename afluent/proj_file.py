@@ -18,7 +18,7 @@ class ProjFile:
     def update_file(self, covered_lines: list, test_result: str, test_case_name: str):
         for line_number in covered_lines:
             if line_number not in self.lines:
-                self.lines[line_number] = line(self.name, line_number)
+                self.lines[line_number] = line.Line(self.name, line_number)
             if test_result == "passed":
                 self.lines[line_number].passed_by.append(test_case_name)
             elif test_result == "failed":
