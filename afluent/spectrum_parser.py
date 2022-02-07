@@ -1,10 +1,9 @@
 """Implement parsing and reassembling functions for coverage data."""
 
-
-from afluent import proj_file
 import json
 from typing import Dict
-from pprint import pprint
+
+from afluent import proj_file
 
 
 class Spectrum:
@@ -22,13 +21,13 @@ class Spectrum:
 
     def generate_report(self):
         """Generate and pretty print the AFL report."""
-        print("here is the report")
+        print(f"here is the report {self.reassembled_data}")
 
     def reassemble(self):
         """Reassemble the coverage information on a file and line basis."""
         # Config is empty, return nothing
         if not self.config:
-            return {}
+            return
         # iterate through every test case in the spectrum report
         for test_case_name, spectrum_dict in self.config.items():
             test_result = spectrum_dict["result"]
@@ -39,11 +38,19 @@ class Spectrum:
                     lines_covered, test_result, test_case_name
                 )
 
+    def as_dict(self):
+        """Return the spectrum information as a JSON writable dictionary."""
+        data_dict = {}
+        for file_name, file_obj in self.reassembled_data.items():
+            data_dict[file_name] = file_obj.as_dict()
+
+        return data_dict
+
 
 if __name__ == "__main__":
-    with open("../spectrum_data.json", "r") as infile:
+    with open("../spectrum_data.json", "r", encoding="utf-8") as infile:
         my_config = json.load(infile)
 
     my_spectrum = Spectrum(my_config)
     my_spectrum.reassemble()
-    pprint(my_spectrum.reassembled_data)
+    print(my_spectrum.as_dict())

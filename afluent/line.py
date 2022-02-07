@@ -1,6 +1,7 @@
 """Create object oriented structure to keep track of line information."""
 
 import math
+from typing import List
 
 TARAN = "tarantula"
 OCHIAI = "ochiai"
@@ -19,9 +20,9 @@ class Line:
         """
         self.path = file_path
         self.number = line_num
-        self.passed_by = []
-        self.failed_by = []
-        self.skipped_by = []
+        self.passed_by: List[str] = []
+        self.failed_by: List[str] = []
+        self.skipped_by: List[str] = []
         self.passed_total = 0
         self.failed_total = 0
         self.sus_scores = {
@@ -61,6 +62,10 @@ class Line:
         self.sus(TARAN)
         self.sus(OCHIAI)
         self.sus(DSTAR, power)
+
+    def as_dict(self):
+        """Return line information as json writable dictionary."""
+        return self.__dict__
 
     @staticmethod
     def tarantula(

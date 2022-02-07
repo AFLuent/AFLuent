@@ -1,7 +1,7 @@
 """Test the proj_file module and ProjFile class."""
 
-from afluent import proj_file, line
 import pytest
+from afluent import line, proj_file
 
 
 def test_projfile_init():
