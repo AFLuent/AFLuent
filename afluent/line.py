@@ -23,15 +23,13 @@ class Line:
         self.passed_by: List[str] = []
         self.failed_by: List[str] = []
         self.skipped_by: List[str] = []
-        self.passed_total = 0
-        self.failed_total = 0
         self.sus_scores = {
             TARAN: -1.0,
             OCHIAI: -1.0,
             DSTAR: -1.0,
         }
 
-    def sus(self, method: str, power=3):
+    def sus(self, method: str, passed_total: int, failed_total: int, power=3):
         """Calculate the suspiciousness score using the passed method.
 
         Args:
@@ -42,26 +40,26 @@ class Line:
             self.sus_scores[TARAN] = Line.tarantula(
                 len(self.failed_by),
                 len(self.passed_by),
-                self.passed_total,
-                self.failed_total,
+                passed_total,
+                failed_total,
             )
         elif method.lower() == OCHIAI:
             self.sus_scores[OCHIAI] = Line.ochiai(
-                len(self.failed_by), len(self.passed_by), self.failed_total
+                len(self.failed_by), len(self.passed_by), failed_total
             )
         elif method.lower() == DSTAR:
             self.sus_scores[DSTAR] = Line.dstar(
-                len(self.failed_by), len(self.passed_by), self.failed_total, power
+                len(self.failed_by), len(self.passed_by), failed_total, power
             )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
-    def sus_all(self, power=3):
+    def sus_all(self, passed_total: int, failed_total: int, power=3):
         """Calculate the suspiciousness score for all available methods."""
         # TODO: refactor this a bit
-        self.sus(TARAN)
-        self.sus(OCHIAI)
-        self.sus(DSTAR, power)
+        self.sus(TARAN, passed_total, failed_total)
+        self.sus(OCHIAI, passed_total, failed_total)
+        self.sus(DSTAR, passed_total, failed_total, power=power)
 
     def as_dict(self):
         """Return line information as json writable dictionary."""

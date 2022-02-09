@@ -57,7 +57,6 @@ def test_line_create():
     assert test_line.path == "sample/path/to/file.py"
     assert test_line.number == 14
     assert not (test_line.passed_by or test_line.failed_by or test_line.skipped_by)
-    assert not (test_line.passed_total or test_line.failed_total)
 
 
 def test_line_sus_all():
@@ -65,11 +64,9 @@ def test_line_sus_all():
     test_line = line.Line("sample/path/to/file.py", 14)
     test_line.passed_by = ["test1", "test2"]
     test_line.failed_by = ["test3", "test4", "test5"]
-    test_line.failed_total = 6
-    test_line.passed_total = 4
     for sus_value in test_line.sus_scores.values():
         assert sus_value == -1.0
-    test_line.sus_all()
+    test_line.sus_all(4, 6)
     assert test_line.sus_scores["tarantula"] == 0.5
     assert test_line.sus_scores["ochiai"] == 0.5477
     assert test_line.sus_scores["dstar"] == 5.4
