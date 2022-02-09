@@ -2,7 +2,7 @@
 
 import coverage  # type: ignore[import]
 import pytest  # type: ignore[import]
-
+import json
 from afluent import spectrum_parser
 
 
@@ -15,7 +15,13 @@ def pytest_sessionstart(session):
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
     """Calculate the coverage of each test case and add it to spectrum."""
-    cov = coverage.Coverage()
+    # TODO: consider accepting this config from CLI
+    cov = coverage.Coverage(
+        data_file=".afluent_coverage",
+        auto_data=False,
+        branch=True,
+        config_file=False,
+    )
     cov.start()
     yield
     cov.stop()
@@ -28,6 +34,7 @@ def pytest_pyfunc_call(pyfuncitem):
         pyfuncitem.session.session_spectrum[pyfuncitem.name]["coverage"][
             measured_file
         ] = cov.get_data().lines(measured_file)
+    cov.erase()
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -42,6 +49,9 @@ def pytest_runtest_makereport(item):
 
 def pytest_sessionfinish(session, exitstatus):
     """Perform the spectrum analysis if at least one test fails."""
+    with open("generated_spectrum.json", "w+", encoding="utf-8") as outfile:
+        json.dump(session.session_spectrum, outfile)
+        print("report exported to json")
     # Tests passed exit status
     if exitstatus == 0:
         print("\nAll tests passed no need to diagnose using AFLuent.")
