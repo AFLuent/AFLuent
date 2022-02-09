@@ -80,7 +80,11 @@ class Line:
         Returns:
             float: suspiciousness score using tarantula
         """
-        # TODO: handle division by zero
+        # TODO: double check if this should happen
+        if total_passed == 0:
+            return 1
+        if total_failed == 0:
+            return 0
         score = (failed_cover / total_failed) / (
             (passed_cover / total_passed) + (failed_cover / total_failed)
         )
@@ -98,7 +102,9 @@ class Line:
         Returns:
             float: suspiciousness score using ochiai
         """
-        # TODO: handle division by zero
+        # TODO: double check if this should happen
+        if total_failed == 0 or failed_cover == 0:
+            return 0
         score = failed_cover / math.sqrt(total_failed * (passed_cover + failed_cover))
         return round(score, 4)
 
@@ -117,7 +123,9 @@ class Line:
         Returns:
             float: suspiciousness score using dstar
         """
-        # TODO: handle division by zero
         uncovered_failed = total_failed - failed_cover
+        # TODO: double check if this should happen
+        if passed_cover + uncovered_failed == 0:
+            return 999999999
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
