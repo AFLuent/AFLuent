@@ -80,4 +80,10 @@ def test_line_sus_unknown():
     test_line.failed_total = 6
     test_line.passed_total = 4
     with pytest.raises(Exception):
-        test_line.sus("random")
+        test_line.sus("random", 5, 5)
+
+
+# def test_something():
+#     """Purposefully fail to check report."""
+#     # TODO: remove me
+#     assert False

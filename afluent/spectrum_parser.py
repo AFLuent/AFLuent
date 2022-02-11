@@ -2,9 +2,8 @@
 
 from typing import Dict, List
 
+from console import fg, bg, fx  # type: ignore[import]
 from afluent import proj_file, line
-
-from console import fg, bg, fx
 
 METHOD_NAMES = ["tarantula", "ochiai", "dstar"]
 
@@ -34,13 +33,13 @@ class Spectrum:
 
     def generate_report(self, method: str, max_items=-1) -> str:
         """Generate and pretty print the AFL report."""
-
         overall_text = ""
-        if not method in METHOD_NAMES:
+        if method not in METHOD_NAMES:
             raise Exception(f"ERROR: Invalid method name {method}")
         sorted_lines = self.generate_rankings(method)
         if max_items > 0:
             sorted_lines = sorted_lines[:max_items]
+        # pylint: disable=C0200
         for line_index in range(0, len(sorted_lines)):
             line_obj = sorted_lines[line_index]
             line_location, sus_score = line_obj.sus_text(method)
@@ -72,10 +71,9 @@ class Spectrum:
                 )
 
     def calculate_sus(self):
-        """Iterate through reassembeled data and calculate the suspiciousness of
-        every line."""
-        for file_name, current_file in self.reassembled_data.items():
-            for line_number, current_line in current_file.lines.items():
+        """Iterate through reassembeled data and calculate the suspiciousness of every line."""
+        for _, current_file in self.reassembled_data.items():
+            for _, current_line in current_file.lines.items():
                 # TODO: add the power argument as passed from user
                 current_line.sus_all(self.totals["passed"], self.totals["failed"])
 
@@ -101,26 +99,47 @@ class Spectrum:
         return all_lines
 
     def print_report(self, method: str):
-        if not method in METHOD_NAMES:
+        """Print a nicely formatted suspiciousness report using the chosen method."""
+        if method not in METHOD_NAMES:
             raise Exception(f"ERROR: Invalid method name {method}")
         print()
-        print(
-            f"{(fx.bold+fg.white)('====================== AFLuent Report =====================')}"
+        header_text = (
+            f"{'====================== AFLuent Report =====================': ^15}"
         )
+        print(f"{header_text}")
         print(self.generate_report(method))
 
     @staticmethod
     def apply_severity(
         line_location: str, method: str, sus_score: float, rank: int, out_of: int
     ) -> str:
-        return f"{PALETTE['location_line'](line_location)}\t{Spectrum.calculate_severity(method, sus_score, rank, out_of)(str(sus_score))}"
+        """Return a formatted/color coded string that shows the line suspiciousness score.
+
+        Args:
+            line_location (str): a string representation of the line location
+            method (str): name of the suspiciousness method used
+            sus_score (float): suspiciousness score of the line
+            rank (int): the rank of this line in the sorted list
+            out_of (int): length of the sorted list
+        """
+        string_representation = f"{PALETTE['location_line'](line_location)}\t"
+        format_function = Spectrum.calculate_severity(method, sus_score, rank, out_of)
+        string_representation += f"{format_function(str(sus_score))}"
+        return string_representation
 
     @staticmethod
     def calculate_severity(method: str, sus_score: float, rank: int, out_of: int):
+        """Return a function to format strings according to score severity.
+
+        Args:
+            method (str): name of the suspiciousness method used
+            sus_score (float): suspiciousness score of the line
+            rank (int): the rank of this line in the sorted list
+            out_of (int): length of the sorted list
+        """
         if sus_score <= 0:
             return PALETTE["safe"]
-        "tarantula", "ochiai", "dstar"
-        if (method == "tarantula" or method == "ochiai") and sus_score == 1:
+        if (method in ["tarantula", "ochiai"]) and sus_score == 1:
             return PALETTE["severe"]
         # TODO: might need updated
         if method == "dstar" and sus_score == 999999999:

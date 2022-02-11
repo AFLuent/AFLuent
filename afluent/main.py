@@ -1,11 +1,13 @@
 """Define Pytest Hooks that run AFLuent."""
 
-import coverage  # type: ignore[import]
-import os
-import pytest  # type: ignore[import]
 import json
+import os
+
+import coverage  # type: ignore[import]
+import pytest  # type: ignore[import]
+from console import bg, fg, fx  # type: ignore[import]
+
 from afluent import spectrum_parser
-from console import fg, bg, fx
 
 
 @pytest.hookimpl()
