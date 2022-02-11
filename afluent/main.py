@@ -1,9 +1,11 @@
 """Define Pytest Hooks that run AFLuent."""
 
 import coverage  # type: ignore[import]
+import os
 import pytest  # type: ignore[import]
 import json
 from afluent import spectrum_parser
+from console import fg, bg, fx
 
 
 @pytest.hookimpl()
@@ -49,16 +51,25 @@ def pytest_runtest_makereport(item):
 
 def pytest_sessionfinish(session, exitstatus):
     """Perform the spectrum analysis if at least one test fails."""
-    with open("generated_spectrum.json", "w+", encoding="utf-8") as outfile:
+    if not os.path.isdir("afluent_data"):
+        os.mkdir("afluent_data")
+    with open(
+        "afluent_data/generated_spectrum.json", "w+", encoding="utf-8"
+    ) as outfile:
         json.dump(session.session_spectrum, outfile)
-        print("report exported to json")
     # Tests passed exit status
     if exitstatus == 0:
-        print("\nAll tests passed no need to diagnose using AFLuent.")
+        exit_message = (fx.bold + fg.white + bg.green)(
+            "\n\nAll tests passed no need to diagnose using AFLuent."
+        )
+        print(f"{exit_message}")
     # some tests failed exit status
     elif exitstatus == 1:
-        print("\nFailing tests detected. Diagnosing using AFLuent...")
+        exit_message = (fx.bold + fg.white + bg.red)(
+            "\n\nFailing tests detected. Diagnosing using AFLuent..."
+        )
+        print(f"{exit_message}")
         full_spectrum = spectrum_parser.Spectrum(session.session_spectrum)
-        full_spectrum.generate_report()
-        # TODO: add the rest of the spectrum calls
-        print("Spectrum report generated...")
+        with open("afluent_data/final_state.json", "w+", encoding="utf-8") as outfile:
+            json.dump(full_spectrum.as_dict(), outfile)
+        full_spectrum.print_report("tarantula")
