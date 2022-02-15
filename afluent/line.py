@@ -67,7 +67,7 @@ class Line:
 
     def sus_text(self, method):
         """Return a tuple of string of line information and score value."""
-        return (f"{self.path}::{self.number}", self.sus_scores[method])
+        return (self.path, self.number, self.sus_scores[method])
 
     @staticmethod
     def tarantula(

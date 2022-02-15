@@ -17,6 +17,7 @@ python = ">=3.7,<4.0"
 pytest = "^6.2.5"
 coverage = "^6.3"
 console = "^0.9907"
+tabulate = "^0.8.9"
 
 [tool.poetry.dev-dependencies]
 pytest-sugar = "^0.9.4"

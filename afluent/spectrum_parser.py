@@ -1,9 +1,11 @@
 """Implement parsing and reassembling functions for coverage data."""
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from console import fg, bg, fx  # type: ignore[import]
 from afluent import proj_file, line
+from tabulate import tabulate
+
 
 METHOD_NAMES = ["tarantula", "ochiai", "dstar"]
 
@@ -31,9 +33,9 @@ class Spectrum:
         self.reassemble()
         self.calculate_sus()
 
-    def generate_report(self, method: str, max_items=-1) -> str:
-        """Generate and pretty print the AFL report."""
-        overall_text = ""
+    def generate_report(self, method: str, max_items=-1) -> List[Tuple]:
+        """Generate a list of tuples containing report information."""
+        report_list = []
         if method not in METHOD_NAMES:
             raise Exception(f"ERROR: Invalid method name {method}")
         sorted_lines = self.generate_rankings(method)
@@ -42,16 +44,15 @@ class Spectrum:
         # pylint: disable=C0200
         for line_index in range(0, len(sorted_lines)):
             line_obj = sorted_lines[line_index]
-            line_location, sus_score = line_obj.sus_text(method)
-            severity_text = Spectrum.apply_severity(
-                line_location,
-                method,
-                sus_score,
-                line_index,
-                max_items,
+            line_path, line_number, sus_score = line_obj.sus_text(method)
+            line_path = f"{PALETTE['location_line'](line_path)}"
+            line_number = f"{PALETTE['location_line'](str(line_number))}"
+            format_function = Spectrum.calculate_severity(
+                method, sus_score, line_index, len(sorted_lines)
             )
-            overall_text += f"{severity_text}\n"
-        return overall_text
+            sus_score = f"{format_function(str(sus_score))}"
+            report_list.append((line_path, line_number, sus_score))
+        return report_list
 
     def reassemble(self):
         """Reassemble the coverage information on a file and line basis."""
@@ -103,29 +104,19 @@ class Spectrum:
         if method not in METHOD_NAMES:
             raise Exception(f"ERROR: Invalid method name {method}")
         print()
-        header_text = (
-            f"{'====================== AFLuent Report =====================': ^15}"
+        header_text = "============================ AFLuent Report ==============================="
+        print(f"{PALETTE['location_line'](header_text)}")
+        print(
+            tabulate(
+                self.generate_report(method),
+                headers=[
+                    f"{PALETTE['location_line']('File Path')}",
+                    f"{PALETTE['location_line']('Line Path')}",
+                    f"{PALETTE['location_line']('Score')}",
+                ],
+                tablefmt="rst",
+            )
         )
-        print(f"{header_text}")
-        print(self.generate_report(method))
-
-    @staticmethod
-    def apply_severity(
-        line_location: str, method: str, sus_score: float, rank: int, out_of: int
-    ) -> str:
-        """Return a formatted/color coded string that shows the line suspiciousness score.
-
-        Args:
-            line_location (str): a string representation of the line location
-            method (str): name of the suspiciousness method used
-            sus_score (float): suspiciousness score of the line
-            rank (int): the rank of this line in the sorted list
-            out_of (int): length of the sorted list
-        """
-        string_representation = f"{PALETTE['location_line'](line_location)}\t"
-        format_function = Spectrum.calculate_severity(method, sus_score, rank, out_of)
-        string_representation += f"{format_function(str(sus_score))}"
-        return string_representation
 
     @staticmethod
     def calculate_severity(method: str, sus_score: float, rank: int, out_of: int):
