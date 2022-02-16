@@ -10,6 +10,16 @@ from console import bg, fg, fx  # type: ignore[import]
 from afluent import spectrum_parser
 
 
+# Pytest args:
+# --afluent-debug: enable, disable the plugin
+# --afl-method one or many method names for afl
+# --result-num number of results to display
+# --afluent-ignore: ignore directories when calculating scores defaults to
+# `tests`
+# --afluent-config: path to the config file
+# TODO: figure out what else
+
+
 @pytest.hookimpl()
 def pytest_sessionstart(session):
     """Create a session variable as empty dictionary to store coverage."""

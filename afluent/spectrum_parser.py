@@ -1,6 +1,6 @@
 """Implement parsing and reassembling functions for coverage data."""
 
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from console import fg, bg, fx  # type: ignore[import]
 from afluent import proj_file, line
@@ -33,7 +33,7 @@ class Spectrum:
         self.reassemble()
         self.calculate_sus()
 
-    def generate_report(self, method: str, max_items=-1) -> List[Tuple]:
+    def generate_report(self, method: str, max_items=-1) -> List[Tuple[Any, Any, Any]]:
         """Generate a list of tuples containing report information."""
         report_list = []
         if method not in METHOD_NAMES:
@@ -111,7 +111,7 @@ class Spectrum:
                 self.generate_report(method),
                 headers=[
                     f"{PALETTE['location_line']('File Path')}",
-                    f"{PALETTE['location_line']('Line Path')}",
+                    f"{PALETTE['location_line']('Line Number')}",
                     f"{PALETTE['location_line']('Score')}",
                 ],
                 tablefmt="rst",

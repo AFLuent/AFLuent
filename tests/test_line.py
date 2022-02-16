@@ -83,6 +83,40 @@ def test_line_sus_unknown():
         test_line.sus("random", 5, 5)
 
 
+def test_line_as_dict():
+    """Check that as_dict() return a correct dictionary."""
+    test_line = line.Line("sample/path/to/file.py", 14)
+    test_line.passed_by = ["test1", "test2"]
+    test_line.failed_by = ["test3", "test4", "test5"]
+    output_dict = test_line.as_dict()
+    expected_dict = {
+        "path": "sample/path/to/file.py",
+        "number": 14,
+        "passed_by": ["test1", "test2"],
+        "failed_by": ["test3", "test4", "test5"],
+        "skipped_by": [],
+        "sus_scores": {
+            "tarantula": -1.0,
+            "ochiai": -1.0,
+            "dstar": -1.0,
+        },
+    }
+    assert output_dict == expected_dict
+
+
+def test_sus_text():
+    """Check that the correct tuple is returned."""
+    test_line = line.Line("sample/path/to/file.py", 14)
+    test_line.sus_scores = {
+        "tarantula": 1.0,
+        "ochiai": 1.0,
+        "dstar": 15.0,
+    }
+    assert test_line.sus_text("tarantula") == ("sample/path/to/file.py", 14, 1.0)
+    assert test_line.sus_text("ochiai") == ("sample/path/to/file.py", 14, 1.0)
+    assert test_line.sus_text("dstar") == ("sample/path/to/file.py", 14, 15.0)
+
+
 # def test_something():
 #     """Purposefully fail to check report."""
 #     # TODO: remove me

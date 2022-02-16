@@ -85,6 +85,9 @@ class Line:
             float: suspiciousness score using tarantula
         """
         # TODO: double check if this should happen
+        # FIXME: this if statement will set uncovered statements to be very
+        # suspicious
+        # TESTME: make sure test cases check all possible inputs
         if total_passed == 0:
             return 1
         if total_failed == 0:
