@@ -1,12 +1,13 @@
 """Include test cases on spectrum_parser module."""
-from afluent import spectrum_parser
 import pytest
+from afluent import spectrum_parser
 
 
 def test_spectrum_init(test_data):
     """Check that spectrum initialization reassembles config and calculates scores."""
     input_config_list = test_data["test_spectrum_init"]["input_config"]
     expected_output_list = test_data["test_spectrum_init"]["output_reassembled"]
+    # pylint: disable=C0200
     for test_index in range(len(input_config_list)):
         config_item = input_config_list[test_index]
         spectrum_object = spectrum_parser.Spectrum(config_item)
@@ -17,7 +18,7 @@ def test_spectrum_init_empty_config():
     """Check that nothing will happen when empty config is passed to
     Spectrum."""
     spectrum_object = spectrum_parser.Spectrum({})
-    assert spectrum_object.reassembled_data == {}
+    assert not spectrum_object.reassembled_data
     assert spectrum_object.totals == {"passed": 0, "failed": 0, "skipped": 0}
 
 
@@ -57,6 +58,7 @@ def test_spectrum_generate_report_throws_error(test_data):
     ],
 )
 def test_calculate_severity(method, sus_score, rank, out_of, formatting_func):
+    """Check that severity calculating returns the correct formatting function."""
     assert (
         spectrum_parser.Spectrum.calculate_severity(method, sus_score, rank, out_of)
         == formatting_func

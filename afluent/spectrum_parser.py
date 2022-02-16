@@ -3,8 +3,8 @@
 from typing import Any, Dict, List, Tuple
 
 from console import fg, bg, fx  # type: ignore[import]
-from afluent import proj_file, line
 from tabulate import tabulate
+from afluent import proj_file, line
 
 
 METHOD_NAMES = ["tarantula", "ochiai", "dstar"]
