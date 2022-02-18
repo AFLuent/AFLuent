@@ -9,6 +9,10 @@ from console import bg, fg, fx  # type: ignore[import]
 
 from afluent import spectrum_parser
 
+WARNING = fx.bold + fg.white + bg.orange
+ERROR = fx.bold + fg.white + bg.red
+VALID = fx.bold + fg.white + bg.green
+
 
 def pytest_addoption(parser, pluginmanager):
     """Add AFLuent command line group and arguments to accept."""
@@ -73,10 +77,21 @@ def pytest_cmdline_main(config):
     """Check if AFLuent is enabled and register the plugin object."""
     # check if the argument to enable afluent exists and create the object with
     # the passed configuration
-    # TODO: handle if no method name was passed and add a defaut
     # TODO: check if other plugins that rely on coverage are registered
     if config.getoption("afl_enable"):
+        # Check if exit after failure is enabled and display warning message
+        if config.getoption("--maxfail"):
+            print(
+                WARNING(
+                    "\nExit after failure detected. AFLuent gives more accurate results if the full test suite was ran.\n"
+                    + "Consider removing `-x` and/or `--maxfail` from CLI arguments."
+                )
+            )
+            print()
         methods = config.getoption("afl_methods")
+        # if no methods were passed, include all of them
+        if not methods:
+            methods = ["tarantula", "ochiai", "dstar"]
         dstar_pow = config.getoption("dstar_pow")
         results_num = config.getoption("results_num")
         ignore = config.getoption("afl_ignore")
@@ -84,11 +99,7 @@ def pytest_cmdline_main(config):
         plugin = Afluent(methods, dstar_pow, results_num, ignore)
         config.pluginmanager.register(plugin, "Afluent")
     else:
-        print(
-            (fx.bold + fg.white + bg.orange)(
-                "\nAFLuent is disabled, report will not be produced."
-            )
-        )
+        print(WARNING("\nAFLuent is disabled, report will not be produced."))
         print()
 
 
@@ -142,13 +153,13 @@ class Afluent:
             json.dump(self.session_spectrum, outfile)
         # Tests passed, exit status is 0
         if exitstatus == 0:
-            exit_message = (fx.bold + fg.white + bg.green)(
+            exit_message = VALID(
                 "\n\nAll tests passed no need to diagnose using AFLuent."
             )
             print(f"{exit_message}")
         # some tests failed exit status
         elif exitstatus == 1:
-            exit_message = (fx.bold + fg.white + bg.red)(
+            exit_message = ERROR(
                 "\n\nFailing tests detected. Diagnosing using AFLuent..."
             )
             print(f"{exit_message}")
