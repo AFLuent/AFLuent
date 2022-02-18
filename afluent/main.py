@@ -10,18 +10,9 @@ from console import bg, fg, fx  # type: ignore[import]
 from afluent import spectrum_parser
 
 
-# Pytest args:
-# --afluent-debug: enable, disable the plugin
-# --afl-method one or many method names for afl
-# --result-num number of results to display
-
-# --afluent-ignore: ignore directories when calculating scores defaults to
-# `tests`
-# TODO: figure out what else
-
-
 def pytest_addoption(parser, pluginmanager):
     """Add AFLuent command line group and arguments to accept."""
+    # TODO: figure out what other arguments are needed
     afluent_group = parser.getgroup("afluent", "Automated Fault Localization (AFLuent)")
     afluent_group.addoption(
         "--afl-debug",
@@ -82,9 +73,15 @@ def pytest_cmdline_main(config):
     """Check if AFLuent is enabled and register the plugin object."""
     # check if the argument to enable afluent exists and create the object with
     # the passed configuration
+    # TODO: handle if no method name was passed and add a defaut
     # TODO: check if other plugins that rely on coverage are registered
     if config.getoption("afl_enable"):
-        plugin = Afluent()
+        methods = config.getoption("afl_methods")
+        dstar_pow = config.getoption("dstar_pow")
+        results_num = config.getoption("results_num")
+        ignore = config.getoption("afl_ignore")
+        # TODO: pass any other arguments here
+        plugin = Afluent(methods, dstar_pow, results_num, ignore)
         config.pluginmanager.register(plugin, "Afluent")
     else:
         print(
@@ -96,34 +93,33 @@ def pytest_cmdline_main(config):
 
 
 class Afluent:
-    def __init__(self):
-        self.enabled = False
-
-    @pytest.hookimpl()
-    def pytest_sessionstart(self, session):
-        """Create a session variable as empty dictionary to store coverage."""
-        session.session_spectrum = {}
+    def __init__(self, methods, dstar_pow, results_num, ignore):
+        self.methods = methods
+        self.dstar_pow = dstar_pow
+        self.results_num = results_num
+        self.ignore = ignore
+        self.session_spectrum = {}
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_pyfunc_call(self, pyfuncitem):
         """Calculate the coverage of each test case and add it to spectrum."""
-        # TODO: consider accepting this config from CLI
         cov = coverage.Coverage(
-            data_file=".afluent_coverage",
+            data_file=None,
             auto_data=False,
             branch=True,
             config_file=False,
+            omit=self.ignore,
         )
         cov.start()
         yield
         cov.stop()
-        pyfuncitem.session.session_spectrum[pyfuncitem.name] = {
+        self.session_spectrum[pyfuncitem.name] = {
             "coverage": {},
             "result": "notSet",
         }
         coverage_data = cov.get_data()
         for measured_file in coverage_data.measured_files():
-            pyfuncitem.session.session_spectrum[pyfuncitem.name]["coverage"][
+            self.session_spectrum[pyfuncitem.name]["coverage"][
                 measured_file
             ] = cov.get_data().lines(measured_file)
         cov.erase()
@@ -133,19 +129,18 @@ class Afluent:
         """Store the outcome of the test case as passed, failed, or skipped."""
         outcome = yield
         if outcome.get_result().when == "call":
-            item.session.session_spectrum[item.name][
-                "result"
-            ] = outcome.get_result().outcome
+            self.session_spectrum[item.name]["result"] = outcome.get_result().outcome
 
     def pytest_sessionfinish(self, session, exitstatus):
         """Perform the spectrum analysis if at least one test fails."""
+        # Store generated json
         if not os.path.isdir("afluent_data"):
             os.mkdir("afluent_data")
         with open(
             "afluent_data/generated_spectrum.json", "w+", encoding="utf-8"
         ) as outfile:
-            json.dump(session.session_spectrum, outfile)
-        # Tests passed exit status
+            json.dump(self.session_spectrum, outfile)
+        # Tests passed, exit status is 0
         if exitstatus == 0:
             exit_message = (fx.bold + fg.white + bg.green)(
                 "\n\nAll tests passed no need to diagnose using AFLuent."
@@ -157,9 +152,11 @@ class Afluent:
                 "\n\nFailing tests detected. Diagnosing using AFLuent..."
             )
             print(f"{exit_message}")
-            full_spectrum = spectrum_parser.Spectrum(session.session_spectrum)
+            full_spectrum = spectrum_parser.Spectrum(
+                self.session_spectrum, dstar_pow=self.dstar_pow
+            )
             with open(
                 "afluent_data/final_state.json", "w+", encoding="utf-8"
             ) as outfile:
                 json.dump(full_spectrum.as_dict(), outfile)
-            full_spectrum.print_report("tarantula")
+            full_spectrum.print_report(self.methods, self.results_num)

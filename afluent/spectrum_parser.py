@@ -21,37 +21,42 @@ PALETTE = {
 class Spectrum:
     """Store all the information for individual files and lines coverage."""
 
-    def __init__(self, config) -> None:
+    def __init__(self, config, dstar_pow=3) -> None:
         """Initialize a spectrum object.
 
         Args:
             config (dict): per-test coverage information
+            dstar_pow (int): power to use when calculating scores using dstar
         """
         self.config = config
         self.reassembled_data: Dict[str, proj_file.ProjFile] = {}
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
+        self.dstar_pow = dstar_pow
         self.reassemble()
         self.calculate_sus()
 
-    def generate_report(self, method: str, max_items=-1) -> List[Tuple[Any, Any, Any]]:
+    def generate_report(
+        self, methods: List[str], max_items=-1
+    ) -> List[Tuple[Any, ...]]:
         """Generate a list of tuples containing report information."""
         report_list = []
-        if method not in METHOD_NAMES:
-            raise Exception(f"ERROR: Invalid method name {method}")
-        sorted_lines = self.generate_rankings(method)
+        # Sort the lines based on the first method name used in the list
+        sorted_lines = self.generate_rankings(methods[0])
         if max_items > 0:
             sorted_lines = sorted_lines[:max_items]
         # pylint: disable=C0200
         for line_index in range(0, len(sorted_lines)):
             line_obj = sorted_lines[line_index]
-            line_path, line_number, sus_score = line_obj.sus_text(method)
+            line_path, line_number, sus_scores = line_obj.sus_text(methods)
             line_path = f"{PALETTE['location_line'](line_path)}"
             line_number = f"{PALETTE['location_line'](str(line_number))}"
+            current_row = [line_path, line_number]
             format_function = Spectrum.calculate_severity(
-                method, sus_score, line_index, len(sorted_lines)
+                methods[0], sus_scores[0], line_index, len(sorted_lines)
             )
-            sus_score = f"{format_function(str(sus_score))}"
-            report_list.append((line_path, line_number, sus_score))
+            for method_score in sus_scores:
+                current_row.append(f"{format_function(str(method_score))}")
+            report_list.append(tuple(current_row))
         return report_list
 
     def reassemble(self):
@@ -75,8 +80,9 @@ class Spectrum:
         """Iterate through reassembeled data and calculate the suspiciousness of every line."""
         for _, current_file in self.reassembled_data.items():
             for _, current_line in current_file.lines.items():
-                # TODO: add the power argument as passed from user
-                current_line.sus_all(self.totals["passed"], self.totals["failed"])
+                current_line.sus_all(
+                    self.totals["passed"], self.totals["failed"], power=self.dstar_pow
+                )
 
     def as_dict(self):
         """Return the spectrum information as a JSON writable dictionary."""
@@ -99,21 +105,24 @@ class Spectrum:
         all_lines.sort(key=lambda x: x.sus_scores[method], reverse=True)
         return all_lines
 
-    def print_report(self, method: str):
+    def print_report(self, methods: List[str], items_num: int):
         """Print a nicely formatted suspiciousness report using the chosen method."""
-        if method not in METHOD_NAMES:
-            raise Exception(f"ERROR: Invalid method name {method}")
+        for method_name in methods:
+            if method_name not in METHOD_NAMES:
+                raise Exception(f"ERROR: Invalid method name {method_name}")
         print()
         header_text = "============================ AFLuent Report ==============================="
+        table_headers = [
+            PALETTE["location_line"]("File Path"),
+            PALETTE["location_line"]("Line Number"),
+        ]
+        for method_name in methods:
+            table_headers.append(PALETTE["location_line"](f"{method_name} Score"))
         print(f"{PALETTE['location_line'](header_text)}")
         print(
             tabulate(
-                self.generate_report(method),
-                headers=[
-                    f"{PALETTE['location_line']('File Path')}",
-                    f"{PALETTE['location_line']('Line Number')}",
-                    f"{PALETTE['location_line']('Score')}",
-                ],
+                self.generate_report(methods, max_items=items_num),
+                headers=table_headers,
                 tablefmt="rst",
             )
         )

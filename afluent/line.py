@@ -65,9 +65,12 @@ class Line:
         """Return line information as json writable dictionary."""
         return self.__dict__
 
-    def sus_text(self, method):
+    def sus_text(self, methods):
         """Return a tuple of string of line information and score value."""
-        return (self.path, self.number, self.sus_scores[method])
+        sus_list = []
+        for method_name in methods:
+            sus_list.append(self.sus_scores[method_name])
+        return (self.path, self.number, sus_list)
 
     @staticmethod
     def tarantula(
