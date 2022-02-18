@@ -112,9 +112,14 @@ def test_sus_text():
         "ochiai": 1.0,
         "dstar": 15.0,
     }
-    assert test_line.sus_text("tarantula") == ("sample/path/to/file.py", 14, 1.0)
-    assert test_line.sus_text("ochiai") == ("sample/path/to/file.py", 14, 1.0)
-    assert test_line.sus_text("dstar") == ("sample/path/to/file.py", 14, 15.0)
+    assert test_line.sus_text(["tarantula"]) == ("sample/path/to/file.py", 14, [1.0])
+    assert test_line.sus_text(["ochiai"]) == ("sample/path/to/file.py", 14, [1.0])
+    assert test_line.sus_text(["dstar"]) == ("sample/path/to/file.py", 14, [15.0])
+    assert test_line.sus_text(["dstar", "tarantula"]) == (
+        "sample/path/to/file.py",
+        14,
+        [15.0, 1.0],
+    )
 
 
 # def test_something():

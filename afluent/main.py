@@ -27,21 +27,21 @@ def pytest_addoption(parser, pluginmanager):
         dest="afl_methods",
         action="append_const",
         const="tarantula",
-        help="Enable debugging using Tarantula",
+        help="Enable fault localization using Tarantula",
     )
     afluent_group.addoption(
         "--ochiai",
         dest="afl_methods",
         action="append_const",
         const="ochiai",
-        help="Enable debugging using Ochiai",
+        help="Enable fault localization using Ochiai",
     )
     afluent_group.addoption(
         "--dstar",
         dest="afl_methods",
         action="append_const",
         const="dstar",
-        help="Enable debugging using Dstar",
+        help="Enable fault localization using Dstar",
     )
     afluent_group.addoption(
         "--dstar-pow",
@@ -65,7 +65,7 @@ def pytest_addoption(parser, pluginmanager):
         action="extend",
         nargs="*",
         type=str,
-        help="Names of files/directories to ignore when calculating coverage for AFLuent.",
+        help="File patterns to ignore when calculating coverage for AFLuent (example: tests/*).",
     )
 
 
