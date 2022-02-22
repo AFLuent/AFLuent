@@ -1,5 +1,8 @@
 """Implement parsing and reassembling functions for coverage data."""
 
+import csv
+import json
+
 from typing import Any, Dict, List, Tuple
 
 from console import fg, bg, fx  # type: ignore[import]
@@ -30,6 +33,7 @@ class Spectrum:
         """
         self.config = config
         self.reassembled_data: Dict[str, proj_file.ProjFile] = {}
+        self.sorted_lines: List[line.Line] = []
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
         self.dstar_pow = dstar_pow
         self.reassemble()
@@ -103,6 +107,8 @@ class Spectrum:
         for file_obj in self.reassembled_data.values():
             all_lines.extend(file_obj.lines.values())
         all_lines.sort(key=lambda x: x.sus_scores[method], reverse=True)
+        # store the sorted list as an attribute
+        self.sorted_lines = all_lines
         return all_lines
 
     def print_report(self, methods: List[str], items_num: int):
@@ -126,6 +132,31 @@ class Spectrum:
                 tablefmt="rst",
             )
         )
+
+    def store_report(self, report_type):
+        """Create and store a report file."""
+        if report_type == "json":
+            data_dict = {}
+            lines_list = list(map(lambda x: x.as_dict(), self.sorted_lines))
+            data_dict["ranking"] = lines_list
+            with open("afluent_report.json", "w+", encoding="utf-8") as outfile:
+                json.dump(data_dict, outfile, indent=4)
+        elif report_type == "csv":
+            header = [
+                "Path",
+                "Line number",
+                "Tarantula Score",
+                "Ochiai Score",
+                "Dstar Score",
+            ]
+            with open("afluent_report.csv", "w+", encoding="utf-8") as outfile:
+                csv_writer = csv.writer(outfile)
+                csv_writer.writerow(header)
+                lines_list = list(map(lambda x: x.as_csv(), self.sorted_lines))
+                csv_writer.writerows(lines_list)
+
+        else:
+            raise Exception(f"Error:Unknown report type {report_type}.")
 
     @staticmethod
     def calculate_severity(method: str, sus_score: float, rank: int, out_of: int):

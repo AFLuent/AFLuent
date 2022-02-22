@@ -1,7 +1,6 @@
 """Define Pytest Hooks that run AFLuent."""
 
 import json
-import os
 
 import coverage  # type: ignore[import]
 import pytest  # type: ignore[import]
@@ -14,7 +13,7 @@ ERROR = fx.bold + fg.white + bg.red
 VALID = fx.bold + fg.white + bg.green
 
 
-def pytest_addoption(parser, pluginmanager):
+def pytest_addoption(parser):
     """Add AFLuent command line group and arguments to accept."""
     # TODO: figure out what other arguments are needed
     afluent_group = parser.getgroup("afluent", "Automated Fault Localization (AFLuent)")
@@ -71,6 +70,21 @@ def pytest_addoption(parser, pluginmanager):
         type=str,
         help="File patterns to ignore when calculating coverage for AFLuent (example: tests/*).",
     )
+    afluent_group.addoption(
+        "--report",
+        dest="report_type",
+        action="store",
+        default=None,
+        type=str,
+        choices=["json", "csv"],
+        help="Store report after AFLuent run.",
+    )
+    afluent_group.addoption(
+        "--per-test-report",
+        dest="per_test",
+        action="store_true",
+        help="Get per test case coverage report.",
+    )
 
 
 def pytest_cmdline_main(config):
@@ -83,7 +97,8 @@ def pytest_cmdline_main(config):
         if config.getoption("--maxfail"):
             print(
                 WARNING(
-                    "\nExit after failure detected. AFLuent gives more accurate results if the full test suite was ran.\n"
+                    "\nExit after failure detected. AFLuent gives more"
+                    + "accurate results if the full test suite was ran.\n"
                     + "Consider removing `-x` and/or `--maxfail` from CLI arguments."
                 )
             )
@@ -95,8 +110,10 @@ def pytest_cmdline_main(config):
         dstar_pow = config.getoption("dstar_pow")
         results_num = config.getoption("results_num")
         ignore = config.getoption("afl_ignore")
+        report = config.getoption("report_type")
+        per_test = config.getoption("per_test")
         # TODO: pass any other arguments here
-        plugin = Afluent(methods, dstar_pow, results_num, ignore)
+        plugin = Afluent(methods, dstar_pow, results_num, ignore, report, per_test)
         config.pluginmanager.register(plugin, "Afluent")
     else:
         print(WARNING("\nAFLuent is disabled, report will not be produced."))
@@ -104,12 +121,18 @@ def pytest_cmdline_main(config):
 
 
 class Afluent:
-    def __init__(self, methods, dstar_pow, results_num, ignore):
+    """Contain all the functionalities and hooks of the AFLuent plugin."""
+
+    # pylint: disable=R0913
+    def __init__(self, methods, dstar_pow, results_num, ignore, report, per_test):
+        """Initialize a plugin object with it's pytest hooks."""
         self.methods = methods
         self.dstar_pow = dstar_pow
         self.results_num = results_num
         self.ignore = ignore
         self.session_spectrum = {}
+        self.report = report
+        self.per_test = per_test
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_pyfunc_call(self, pyfuncitem):
@@ -142,15 +165,14 @@ class Afluent:
         if outcome.get_result().when == "call":
             self.session_spectrum[item.name]["result"] = outcome.get_result().outcome
 
-    def pytest_sessionfinish(self, session, exitstatus):
+    def pytest_sessionfinish(self, exitstatus):
         """Perform the spectrum analysis if at least one test fails."""
         # Store generated json
-        if not os.path.isdir("afluent_data"):
-            os.mkdir("afluent_data")
-        with open(
-            "afluent_data/generated_spectrum.json", "w+", encoding="utf-8"
-        ) as outfile:
-            json.dump(self.session_spectrum, outfile)
+        if self.per_test:
+            with open(
+                "afluent_per_test_report.json", "w+", encoding="utf-8"
+            ) as outfile:
+                json.dump(self.session_spectrum, outfile)
         # Tests passed, exit status is 0
         if exitstatus == 0:
             exit_message = VALID(
@@ -166,8 +188,7 @@ class Afluent:
             full_spectrum = spectrum_parser.Spectrum(
                 self.session_spectrum, dstar_pow=self.dstar_pow
             )
-            with open(
-                "afluent_data/final_state.json", "w+", encoding="utf-8"
-            ) as outfile:
-                json.dump(full_spectrum.as_dict(), outfile)
             full_spectrum.print_report(self.methods, self.results_num)
+            if self.report:
+                print(f"Storing {self.report} report...")
+                full_spectrum.store_report(self.report)

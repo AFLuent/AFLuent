@@ -65,6 +65,16 @@ class Line:
         """Return line information as json writable dictionary."""
         return self.__dict__
 
+    def as_csv(self):
+        """Return line information as csv writable list."""
+        return [
+            self.path,
+            self.number,
+            self.sus_scores[TARAN],
+            self.sus_scores[OCHIAI],
+            self.sus_scores[DSTAR],
+        ]
+
     def sus_text(self, methods):
         """Return a tuple of string of line information and score value."""
         sus_list = []
