@@ -172,7 +172,7 @@ class Afluent:
             with open(
                 "afluent_per_test_report.json", "w+", encoding="utf-8"
             ) as outfile:
-                json.dump(self.session_spectrum, outfile)
+                json.dump(self.session_spectrum, outfile, indent=4)
         # Tests passed, exit status is 0
         if exitstatus == 0:
             exit_message = VALID(
