@@ -1,8 +1,10 @@
 """Create object oriented structure for files carrying line coverage information."""
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
+
+import radon  # type: ignore[import]
+import radon.complexity as cc  # type: ignore[import]
+
 from afluent import line
-import radon
-import radon.complexity as cc
 
 
 class ProjFile:
@@ -72,8 +74,7 @@ class ProjFile:
 
     @staticmethod
     def get_complexity_score(line_num, dataset) -> int:
-        """Searches for the correct line range in the dataset and return the
-        complexity score.add()
+        """Search for the correct line range in the dataset and return the complexity score.
 
         Args:
             line_num (int): number of the line being searched for
@@ -87,6 +88,6 @@ class ProjFile:
             return 0
         # TODO: refactor to use binary search
         for line_range in dataset:
-            if line_num >= line_range[0] and line_num <= line_range[1]:
+            if line_range[0] <= line_num <= line_range[1]:
                 return line_range[2]
         return 0

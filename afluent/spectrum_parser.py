@@ -61,6 +61,7 @@ class Spectrum:
             )
             for method_score in sus_scores:
                 current_row.append(f"{format_function(str(method_score))}")
+            # TODO: remove complexity from display
             current_row.append(str(line_obj.complexity))
             report_list.append(tuple(current_row))
         return report_list
@@ -131,7 +132,8 @@ class Spectrum:
         ]
         for method_name in methods:
             table_headers.append(PALETTE["location_line"](f"{method_name} Score"))
-        table_headers.append(PALETTE["location_line"](f"Complexity"))
+        # TODO: remove this header
+        table_headers.append(PALETTE["location_line"]("Complexity"))
         print(f"{PALETTE['location_line'](header_text)}")
         print(
             tabulate(

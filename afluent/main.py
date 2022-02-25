@@ -133,7 +133,7 @@ def pytest_cmdline_main(config):
 class Afluent:
     """Contain all the functionalities and hooks of the AFLuent plugin."""
 
-    # pylint: disable=R0913
+    # pylint: disable=R0913, R0902
     def __init__(
         self,
         methods,
