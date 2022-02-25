@@ -85,6 +85,13 @@ def pytest_addoption(parser):
         action="store_true",
         help="Get per test case coverage report.",
     )
+    afluent_group.addoption(
+        "--count-complexity",
+        dest="complexity",
+        default=False,
+        action="store_true",
+        help="enable tie breaking using cyclomatic complexity.",
+    )
 
 
 def pytest_cmdline_main(config):
@@ -112,8 +119,11 @@ def pytest_cmdline_main(config):
         ignore = config.getoption("afl_ignore")
         report = config.getoption("report_type")
         per_test = config.getoption("per_test")
-        # TODO: pass any other arguments here
-        plugin = Afluent(methods, dstar_pow, results_num, ignore, report, per_test)
+        complexity = config.getoption("complexity")
+        # TODO: pass the full pytest config object instead?
+        plugin = Afluent(
+            methods, dstar_pow, results_num, ignore, report, per_test, complexity
+        )
         config.pluginmanager.register(plugin, "Afluent")
     else:
         print(WARNING("\nAFLuent is disabled, report will not be produced."))
@@ -124,7 +134,16 @@ class Afluent:
     """Contain all the functionalities and hooks of the AFLuent plugin."""
 
     # pylint: disable=R0913
-    def __init__(self, methods, dstar_pow, results_num, ignore, report, per_test):
+    def __init__(
+        self,
+        methods,
+        dstar_pow,
+        results_num,
+        ignore,
+        report,
+        per_test,
+        complexity,
+    ):
         """Initialize a plugin object with it's pytest hooks."""
         self.methods = methods
         self.dstar_pow = dstar_pow
@@ -133,6 +152,7 @@ class Afluent:
         self.session_spectrum = {}
         self.report = report
         self.per_test = per_test
+        self.complexity = complexity
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_pyfunc_call(self, pyfuncitem):
@@ -186,7 +206,9 @@ class Afluent:
             )
             print(f"{exit_message}")
             full_spectrum = spectrum_parser.Spectrum(
-                self.session_spectrum, dstar_pow=self.dstar_pow, complexity=True
+                self.session_spectrum,
+                dstar_pow=self.dstar_pow,
+                complexity=self.complexity,
             )
             full_spectrum.print_report(self.methods, self.results_num)
             if self.report:
