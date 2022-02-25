@@ -28,6 +28,7 @@ class Line:
             OCHIAI: -1.0,
             DSTAR: -1.0,
         }
+        self.complexity = 0
 
     def sus(self, method: str, passed_total: int, failed_total: int, power=3):
         """Calculate the suspiciousness score using the passed method.

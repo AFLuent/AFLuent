@@ -34,7 +34,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "2": {
                 "path": "file1.py",
@@ -46,7 +47,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "3": {
                 "path": "file1.py",
@@ -58,7 +60,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "4": {
                 "path": "file1.py",
@@ -70,7 +73,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "5": {
                 "path": "file1.py",
@@ -82,7 +86,8 @@
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
                     "dstar": 1.0
-                }
+                },
+                "complexity": 0
             },
             "6": {
                 "path": "file1.py",
@@ -94,7 +99,8 @@
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
                     "dstar": 1.0
-                }
+                },
+                "complexity": 0
             },
             "7": {
                 "path": "file1.py",
@@ -106,7 +112,8 @@
                     "tarantula": 1.0,
                     "ochiai": 1.0,
                     "dstar": 999999999
-                }
+                },
+                "complexity": 0
             }
         },
         "file2.py": {
@@ -120,7 +127,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "2": {
                 "path": "file2.py",
@@ -132,7 +140,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "3": {
                 "path": "file2.py",
@@ -144,7 +153,8 @@
                     "tarantula": 0.5,
                     "ochiai": 0.5774,
                     "dstar": 0.5
-                }
+                },
+                "complexity": 0
             },
             "4": {
                 "path": "file2.py",
@@ -156,7 +166,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "5": {
                 "path": "file2.py",
@@ -168,7 +179,8 @@
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
                     "dstar": 1.0
-                }
+                },
+                "complexity": 0
             },
             "6": {
                 "path": "file2.py",
@@ -180,7 +192,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "7": {
                 "path": "file2.py",
@@ -192,7 +205,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "8": {
                 "path": "file2.py",
@@ -204,7 +218,8 @@
                     "tarantula": 0.0,
                     "ochiai": 0,
                     "dstar": 0.0
-                }
+                },
+                "complexity": 0
             },
             "9": {
                 "path": "file2.py",
@@ -216,7 +231,8 @@
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
                     "dstar": 1.0
-                }
+                },
+                "complexity": 0
             }
 
         }

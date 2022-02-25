@@ -24,7 +24,7 @@ PALETTE = {
 class Spectrum:
     """Store all the information for individual files and lines coverage."""
 
-    def __init__(self, config, dstar_pow=3) -> None:
+    def __init__(self, config, dstar_pow=3, complexity=False) -> None:
         """Initialize a spectrum object.
 
         Args:
@@ -36,6 +36,7 @@ class Spectrum:
         self.sorted_lines: List[line.Line] = []
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
         self.dstar_pow = dstar_pow
+        self.complexity = complexity
         self.reassemble()
         self.calculate_sus()
 
@@ -60,6 +61,7 @@ class Spectrum:
             )
             for method_score in sus_scores:
                 current_row.append(f"{format_function(str(method_score))}")
+            current_row.append(str(line_obj.complexity))
             report_list.append(tuple(current_row))
         return report_list
 
@@ -75,7 +77,12 @@ class Spectrum:
             self.totals[test_result] += 1
             for file_name, lines_covered in spectrum_dict["coverage"].items():
                 if file_name not in self.reassembled_data:
-                    self.reassembled_data[file_name] = proj_file.ProjFile(file_name)
+                    # Initialize a new object of one doesn't already exist
+                    file_obj = proj_file.ProjFile(file_name)
+                    if self.complexity:
+                        # calculate it's complexity dataset
+                        file_obj.get_complexity_dataset()
+                    self.reassembled_data[file_name] = file_obj
                 self.reassembled_data[file_name].update_file(
                     lines_covered, test_result, test_case_name
                 )
@@ -106,7 +113,7 @@ class Spectrum:
         all_lines: List[line.Line] = []
         for file_obj in self.reassembled_data.values():
             all_lines.extend(file_obj.lines.values())
-        all_lines.sort(key=lambda x: x.sus_scores[method], reverse=True)
+        all_lines.sort(key=lambda x: (x.sus_scores[method], x.complexity), reverse=True)
         # store the sorted list as an attribute
         self.sorted_lines = all_lines
         return all_lines
@@ -124,6 +131,7 @@ class Spectrum:
         ]
         for method_name in methods:
             table_headers.append(PALETTE["location_line"](f"{method_name} Score"))
+        table_headers.append(PALETTE["location_line"](f"Complexity"))
         print(f"{PALETTE['location_line'](header_text)}")
         print(
             tabulate(

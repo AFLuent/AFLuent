@@ -186,7 +186,7 @@ class Afluent:
             )
             print(f"{exit_message}")
             full_spectrum = spectrum_parser.Spectrum(
-                self.session_spectrum, dstar_pow=self.dstar_pow
+                self.session_spectrum, dstar_pow=self.dstar_pow, complexity=True
             )
             full_spectrum.print_report(self.methods, self.results_num)
             if self.report:

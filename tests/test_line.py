@@ -100,6 +100,7 @@ def test_line_as_dict():
             "ochiai": -1.0,
             "dstar": -1.0,
         },
+        "complexity": 0,
     }
     assert output_dict == expected_dict
 
