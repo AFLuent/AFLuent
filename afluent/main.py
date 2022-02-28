@@ -164,25 +164,28 @@ class Afluent:
             config_file=False,
             omit=self.ignore,
         )
-        cov.start()
-        yield
-        cov.stop()
-        self.session_spectrum[pyfuncitem.name] = {
-            "coverage": {},
-            "result": "notSet",
-        }
-        coverage_data = cov.get_data()
-        for measured_file in coverage_data.measured_files():
-            self.session_spectrum[pyfuncitem.name]["coverage"][
-                measured_file
-            ] = cov.get_data().lines(measured_file)
+        try:
+            cov.start()
+            yield
+            cov.stop()
+            coverage_data = cov.get_data()
+            self.session_spectrum[pyfuncitem.name] = {
+                "coverage": {},
+                "result": "notSet",
+            }
+            for measured_file in coverage_data.measured_files():
+                self.session_spectrum[pyfuncitem.name]["coverage"][
+                    measured_file
+                ] = cov.get_data().lines(measured_file)
+        except coverage.exceptions.CoverageWarning as e:
+            pass
         cov.erase()
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_runtest_makereport(self, item):
         """Store the outcome of the test case as passed, failed, or skipped."""
         outcome = yield
-        if outcome.get_result().when == "call":
+        if outcome.get_result().when == "call" and item.name in self.session_spectrum:
             self.session_spectrum[item.name]["result"] = outcome.get_result().outcome
 
     def pytest_sessionfinish(self, exitstatus):
