@@ -83,7 +83,7 @@ class Spectrum:
                     file_obj = proj_file.ProjFile(file_name)
                     if self.complexity:
                         # calculate it's complexity dataset
-                        file_obj.get_complexity_dataset()
+                        file_obj.get_cyclomatic_complexity_dataset()
                     self.reassembled_data[file_name] = file_obj
                 self.reassembled_data[file_name].update_file(
                     lines_covered, test_result, test_case_name

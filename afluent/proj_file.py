@@ -1,5 +1,5 @@
 """Create object oriented structure for files carrying line coverage information."""
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import radon  # type: ignore[import]
 import radon.complexity as cc  # type: ignore[import]
@@ -18,7 +18,8 @@ class ProjFile:
         """
         self.name = name
         self.lines: Dict[int, line.Line] = {}
-        self.complexity_data: List[Tuple[int, int, int]] = []
+        self.cyclomatic_complexity_data: List[Tuple[int, int, int]] = []
+        self.syntax_complexity_data: Dict[int, List[Dict[str, Any]]] = {}
 
     def update_file(
         self, covered_lines: list[int], test_result: str, test_case_name: str
@@ -39,7 +40,7 @@ class ProjFile:
                 line_obj = line.Line(self.name, line_number)
                 # get the complexity of the line
                 line_obj.complexity = ProjFile.get_complexity_score(
-                    line_number, self.complexity_data
+                    line_number, self.cyclomatic_complexity_data
                 )
                 self.lines[line_number] = line_obj
             if test_result == "passed":
@@ -51,7 +52,7 @@ class ProjFile:
             else:
                 raise Exception(f"Unknown test result for {test_case_name}")
 
-    def get_complexity_dataset(self):
+    def get_cyclomatic_complexity_dataset(self):
         """Use the file path to calculate complexity and update the data."""
         with open(self.name, "r", encoding="utf-8") as infile:
             file_string = infile.read()
@@ -63,7 +64,7 @@ class ProjFile:
             # Check if the current item is a Function and add it's information
             if isinstance(item, radon.visitors.Function):
                 cc_lines.append((item.lineno, item.endline, item.complexity))
-        self.complexity_data = cc_lines
+        self.cyclomatic_complexity_data = cc_lines
 
     def as_dict(self):
         """Return lines as a json writable dictionary."""

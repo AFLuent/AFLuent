@@ -20,6 +20,7 @@ console = "^0.9907"
 tabulate = "^0.8.9"
 types-tabulate = "^0.8.5"
 radon = "^5.1.0"
+libcst = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest-sugar = "^0.9.4"
