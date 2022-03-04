@@ -2,6 +2,7 @@
 
 import csv
 import json
+import random
 
 from typing import Any, Dict, List, Tuple
 
@@ -114,6 +115,8 @@ class Spectrum:
         all_lines: List[line.Line] = []
         for file_obj in self.reassembled_data.values():
             all_lines.extend(file_obj.lines.values())
+        # Introduce some randomness before sorting
+        random.shuffle(all_lines)
         all_lines.sort(key=lambda x: (x.sus_scores[method], x.complexity), reverse=True)
         # store the sorted list as an attribute
         self.sorted_lines = all_lines
