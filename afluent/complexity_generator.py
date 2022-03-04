@@ -68,8 +68,6 @@ class LocationFinder(cst.CSTVisitor):
             # TODO: uncomment this
             # "node": node,
         }
-        if not (node_type == "SimpleStatementLine" or node_type == "Return"):
-            metadata_dict["contents"] = []
         return metadata_dict
 
     def fill_locations_range(self, metadata):
