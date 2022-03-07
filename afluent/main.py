@@ -157,6 +157,7 @@ class Afluent:
     @pytest.hookimpl(hookwrapper=True)
     def pytest_pyfunc_call(self, pyfuncitem):
         """Calculate the coverage of each test case and add it to spectrum."""
+        # TODO: try initializing the object in the __init__ function
         cov = coverage.Coverage(
             data_file=None,
             auto_data=False,

@@ -101,7 +101,7 @@ class Line:
         # TODO: double check if this should happen
         # FIXME: this if statement will set uncovered statements to be very
         # suspicious
-        # TESTME: make sure test cases check all possible inputs
+        # TODO: make sure test cases check all possible inputs
         if total_passed == 0:
             return 1
         if total_failed == 0:
@@ -147,6 +147,7 @@ class Line:
         uncovered_failed = total_failed - failed_cover
         # TODO: double check if this should happen
         if passed_cover + uncovered_failed == 0:
+            # TODO: change this to return the maximum integer value
             return 999999999
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
