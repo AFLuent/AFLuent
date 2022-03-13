@@ -8,6 +8,7 @@ OCHIAI = "ochiai"
 DSTAR = "dstar"
 
 
+# pylint: disable=R0902
 class Line:
     """Implement the line object and suspiciousness calculation."""
 

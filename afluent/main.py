@@ -86,13 +86,19 @@ def pytest_addoption(parser):
         help="Get per test case coverage report.",
     )
     afluent_group.addoption(
-        "--count-complexity",
-        dest="complexity",
+        "--cyclomatic-complexity",
+        dest="c_complexity",
         default=False,
         action="store_true",
         help="enable tie breaking using cyclomatic complexity.",
     )
-    # TODO: create option for syntax complexity
+    afluent_group.addoption(
+        "--syntax-complexity",
+        dest="s_complexity",
+        default=False,
+        action="store_true",
+        help="enable tie breaking using syntax complexity.",
+    )
 
 
 def pytest_cmdline_main(config):
@@ -111,20 +117,7 @@ def pytest_cmdline_main(config):
                 )
             )
             print()
-        methods = config.getoption("afl_methods")
-        # if no methods were passed, include all of them
-        if not methods:
-            methods = ["tarantula", "ochiai", "dstar"]
-        dstar_pow = config.getoption("dstar_pow")
-        results_num = config.getoption("results_num")
-        ignore = config.getoption("afl_ignore")
-        report = config.getoption("report_type")
-        per_test = config.getoption("per_test")
-        complexity = config.getoption("complexity")
-        # TODO: pass the full pytest config object instead?
-        plugin = Afluent(
-            methods, dstar_pow, results_num, ignore, report, per_test, complexity
-        )
+        plugin = Afluent(config)
         config.pluginmanager.register(plugin, "Afluent")
     else:
         print(WARNING("\nAFLuent is disabled, report will not be produced."))
@@ -135,25 +128,20 @@ class Afluent:
     """Contain all the functionalities and hooks of the AFLuent plugin."""
 
     # pylint: disable=R0913, R0902
-    def __init__(
-        self,
-        methods,
-        dstar_pow,
-        results_num,
-        ignore,
-        report,
-        per_test,
-        complexity,
-    ):
+    def __init__(self, pytest_config):
         """Initialize a plugin object with it's pytest hooks."""
-        self.methods = methods
-        self.dstar_pow = dstar_pow
-        self.results_num = results_num
-        self.ignore = ignore
+        self.methods = pytest_config.getoption("afl_methods")
+        # if no methods were passed, include all of them
+        if not self.methods:
+            self.methods = ["dstar", "tarantula", "ochiai"]
+        self.dstar_pow = pytest_config.getoption("dstar_pow")
+        self.results_num = pytest_config.getoption("results_num")
+        self.ignore = pytest_config.getoption("afl_ignore")
+        self.report = pytest_config.getoption("report_type")
+        self.per_test = pytest_config.getoption("per_test")
+        self.c_complexity = pytest_config.getoption("c_complexity")
+        self.s_complexity = pytest_config.getoption("s_complexity")
         self.session_spectrum = {}
-        self.report = report
-        self.per_test = per_test
-        self.complexity = complexity
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_pyfunc_call(self, pyfuncitem):
@@ -179,7 +167,7 @@ class Afluent:
                 self.session_spectrum[pyfuncitem.name]["coverage"][
                     measured_file
                 ] = cov.get_data().lines(measured_file)
-        except coverage.exceptions.CoverageWarning as e:
+        except coverage.exceptions.CoverageWarning:
             pass
         cov.erase()
 
@@ -213,7 +201,8 @@ class Afluent:
             full_spectrum = spectrum_parser.Spectrum(
                 self.session_spectrum,
                 dstar_pow=self.dstar_pow,
-                complexity=self.complexity,
+                c_complexity=self.c_complexity,
+                s_complexity=self.s_complexity,
             )
             full_spectrum.print_report(self.methods, self.results_num)
             if self.report:

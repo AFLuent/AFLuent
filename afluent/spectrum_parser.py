@@ -66,7 +66,8 @@ class Spectrum:
             for method_score in sus_scores:
                 current_row.append(f"{format_function(str(method_score))}")
             # TODO: remove complexity from display
-            current_row.append(str(line_obj.complexity))
+            current_row.append(str(line_obj.c_complexity))
+            current_row.append(str(line_obj.s_complexity))
             report_list.append(tuple(current_row))
         return report_list
 
@@ -122,7 +123,10 @@ class Spectrum:
             all_lines.extend(file_obj.lines.values())
         # Introduce some randomness before sorting
         random.shuffle(all_lines)
-        all_lines.sort(key=lambda x: (x.sus_scores[method], x.complexity), reverse=True)
+        # TODO: incorporate both types of complexity if necessary
+        all_lines.sort(
+            key=lambda x: (x.sus_scores[method], x.c_complexity), reverse=True
+        )
         # store the sorted list as an attribute
         self.sorted_lines = all_lines
         return all_lines
@@ -140,8 +144,9 @@ class Spectrum:
         ]
         for method_name in methods:
             table_headers.append(PALETTE["location_line"](f"{method_name} Score"))
-        # TODO: remove this header
-        table_headers.append(PALETTE["location_line"]("Complexity"))
+        # TODO: remove these two headers
+        table_headers.append(PALETTE["location_line"]("C_Complexity"))
+        table_headers.append(PALETTE["location_line"]("S_Complexity"))
         print(f"{PALETTE['location_line'](header_text)}")
         print(
             tabulate(

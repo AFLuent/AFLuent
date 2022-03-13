@@ -63,6 +63,7 @@ class ProjFile:
         self.cyclomatic_complexity_data = cc_generator.data
 
     def get_syntax_complexity_dataset(self):
+        """Use complexity generator to get the syntax complexity dataset."""
         s_generator = complexity_generator.SyntaxtComplexityGenerator(self.name)
         s_generator.calculate_syntax_complexity()
         # TODO: change what gets used here
