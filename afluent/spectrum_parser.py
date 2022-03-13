@@ -25,7 +25,9 @@ PALETTE = {
 class Spectrum:
     """Store all the information for individual files and lines coverage."""
 
-    def __init__(self, config, dstar_pow=3, complexity=False) -> None:
+    def __init__(
+        self, config, dstar_pow=3, c_complexity=False, s_complexity=False
+    ) -> None:
         """Initialize a spectrum object.
 
         Args:
@@ -37,7 +39,8 @@ class Spectrum:
         self.sorted_lines: List[line.Line] = []
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
         self.dstar_pow = dstar_pow
-        self.complexity = complexity
+        self.c_complexity = c_complexity
+        self.s_complexity = s_complexity
         self.reassemble()
         self.calculate_sus()
 
@@ -81,9 +84,11 @@ class Spectrum:
                 if file_name not in self.reassembled_data:
                     # Initialize a new object of one doesn't already exist
                     file_obj = proj_file.ProjFile(file_name)
-                    if self.complexity:
+                    if self.c_complexity:
                         # calculate it's complexity dataset
                         file_obj.get_cyclomatic_complexity_dataset()
+                    if self.s_complexity:
+                        file_obj.get_syntax_complexity_dataset()
                     self.reassembled_data[file_name] = file_obj
                 self.reassembled_data[file_name].update_file(
                     lines_covered, test_result, test_case_name

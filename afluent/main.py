@@ -92,6 +92,7 @@ def pytest_addoption(parser):
         action="store_true",
         help="enable tie breaking using cyclomatic complexity.",
     )
+    # TODO: create option for syntax complexity
 
 
 def pytest_cmdline_main(config):

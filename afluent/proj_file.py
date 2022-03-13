@@ -1,8 +1,7 @@
 """Create object oriented structure for files carrying line coverage information."""
 from typing import Any, Dict, List, Tuple
 
-import radon  # type: ignore[import]
-import radon.complexity as cc  # type: ignore[import]
+from afluent import complexity_generator
 
 from afluent import line
 
@@ -38,10 +37,14 @@ class ProjFile:
             # Line doesn't exist in the dataset, create new one
             if line_number not in self.lines:
                 line_obj = line.Line(self.name, line_number)
-                # get the complexity of the line
-                line_obj.complexity = ProjFile.get_complexity_score(
-                    line_number, self.cyclomatic_complexity_data
-                )
+                if self.cyclomatic_complexity_data:
+                    # get the complexity of the line
+                    line_obj.c_complexity = ProjFile.get_cyclomatic_complexity_score(
+                        line_number, self.cyclomatic_complexity_data
+                    )
+                # TODO: implement how syntax complexity should be retrieved
+                # if self.syntax_complexity_data:
+
                 self.lines[line_number] = line_obj
             if test_result == "passed":
                 self.lines[line_number].passed_by.append(test_case_name)
@@ -54,17 +57,16 @@ class ProjFile:
 
     def get_cyclomatic_complexity_dataset(self):
         """Use the file path to calculate complexity and update the data."""
-        with open(self.name, "r", encoding="utf-8") as infile:
-            file_string = infile.read()
-            complexity_data = cc.sorted_results(cc.cc_visit(file_string), cc.LINES)
-        # reassemble complexity data to follow this format
-        # List(Tuple(line_start:int, line_end:int, complexity_score:int))
-        cc_lines = []
-        for item in complexity_data:
-            # Check if the current item is a Function and add it's information
-            if isinstance(item, radon.visitors.Function):
-                cc_lines.append((item.lineno, item.endline, item.complexity))
-        self.cyclomatic_complexity_data = cc_lines
+        # set cyclomatic complexity to be enabled
+        cc_generator = complexity_generator.CyclomaticComplexityGenerator(self.name)
+        cc_generator.calculate_syntax_complexity()
+        self.cyclomatic_complexity_data = cc_generator.data
+
+    def get_syntax_complexity_dataset(self):
+        s_generator = complexity_generator.SyntaxtComplexityGenerator(self.name)
+        s_generator.calculate_syntax_complexity()
+        # TODO: change what gets used here
+        self.syntax_complexity_data = s_generator.data
 
     def as_dict(self):
         """Return lines as a json writable dictionary."""
@@ -74,7 +76,7 @@ class ProjFile:
         return data_dictionary
 
     @staticmethod
-    def get_complexity_score(line_num, dataset) -> int:
+    def get_cyclomatic_complexity_score(line_num, dataset) -> int:
         """Search for the correct line range in the dataset and return the complexity score.
 
         Args:
