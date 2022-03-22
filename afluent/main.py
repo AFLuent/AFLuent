@@ -1,5 +1,6 @@
 """Define Pytest Hooks that run AFLuent."""
 
+from gettext import install
 import json
 
 import coverage  # type: ignore[import]
@@ -8,9 +9,13 @@ from console import bg, fg, fx  # type: ignore[import]
 
 from afluent import spectrum_parser
 
+from pprint import pprint
+
 WARNING = fx.bold + fg.white + bg.orange
 ERROR = fx.bold + fg.white + bg.red
 VALID = fx.bold + fg.white + bg.green
+
+CONFLICTING_PLUGINS = ["pytest_cov"]
 
 
 def pytest_addoption(parser):
@@ -105,14 +110,23 @@ def pytest_cmdline_main(config):
     """Check if AFLuent is enabled and register the plugin object."""
     # check if the argument to enable afluent exists and create the object with
     # the passed configuration
-    # TODO: check if other plugins that rely on coverage are registered
+    installed_plugins = config.pluginmanager.list_name_plugin()
+    for plugin_name, _ in installed_plugins:
+        if plugin_name in CONFLICTING_PLUGINS:
+            print(
+                WARNING(
+                    f"\n{plugin_name} plugin conflicts with AFLuent, consider disabling\n"
+                    + "it for this session to get the most accurate fault localization results.\n\n"
+                )
+            )
+
     if config.getoption("afl_enable"):
         # Check if exit after failure is enabled and display warning message
         if config.getoption("--maxfail"):
             print(
                 WARNING(
-                    "\nExit after failure detected. AFLuent gives more"
-                    + "accurate results if the full test suite was ran.\n"
+                    "\nExit after failure detected. AFLuent gives more "
+                    + "accurate results if the full test suite was ran.\n\n"
                     + "Consider removing `-x` and/or `--maxfail` from CLI arguments."
                 )
             )
@@ -120,7 +134,11 @@ def pytest_cmdline_main(config):
         plugin = Afluent(config)
         config.pluginmanager.register(plugin, "Afluent")
     else:
-        print(WARNING("\nAFLuent is disabled, report will not be produced."))
+        print(
+            WARNING(
+                "\nAFLuent is disabled. Enable AFLuent by adding --afl or --afl-debug to the test command."
+            )
+        )
         print()
 
 
@@ -189,7 +207,7 @@ class Afluent:
         # Tests passed, exit status is 0
         if exitstatus == 0:
             exit_message = VALID(
-                "\n\nAll tests passed no need to diagnose using AFLuent."
+                "\n\nAll tests passed, no need to diagnose using AFLuent."
             )
             print(f"{exit_message}")
         # some tests failed exit status
