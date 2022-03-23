@@ -12,6 +12,7 @@ from afluent import proj_file, line
 
 
 METHOD_NAMES = ["tarantula", "ochiai", "ochiai2", "dstar"]
+TIEBREAKERS = ["random", "cyclomatic", "logical", "enhanced"]
 
 PALETTE = {
     "severe": fg.white + fx.bold + bg.lightred,
@@ -25,6 +26,7 @@ PALETTE = {
 class Spectrum:
     """Store all the information for individual files and lines coverage."""
 
+    # TODO: add tiebreaker type
     def __init__(
         self, config, dstar_pow=3, c_complexity=False, s_complexity=False
     ) -> None:
@@ -49,8 +51,15 @@ class Spectrum:
     ) -> List[Tuple[Any, ...]]:
         """Generate a list of tuples containing report information."""
         report_list = []
+        # Gather up all the line objects in one list
+        all_lines: List[line.Line] = []
+        for file_obj in self.reassembled_data.values():
+            all_lines.extend(file_obj.lines.values())
+        # TODO: pass the tie breaker here
         # Sort the lines based on the first method name used in the list
-        sorted_lines = self.generate_rankings(methods[0])
+        sorted_lines = Spectrum.generate_rankings(all_lines, methods[0])
+        # store as an instance variable to generate reports later
+        self.sorted_lines = sorted_lines
         if max_items > 0:
             sorted_lines = sorted_lines[:max_items]
         # pylint: disable=C0200
@@ -111,26 +120,6 @@ class Spectrum:
 
         return data_dict
 
-    def generate_rankings(self, method: str) -> List[line.Line]:
-        """Return a list of line objects ranked from the most to least suspicious.
-
-        Args:
-            method (str): name of the suspiciousness score to use for sorting
-        """
-        # Gather up all the line objects in one list
-        all_lines: List[line.Line] = []
-        for file_obj in self.reassembled_data.values():
-            all_lines.extend(file_obj.lines.values())
-        # Introduce some randomness before sorting
-        random.shuffle(all_lines)
-        # TODO: change how sorting is based off of
-        all_lines.sort(
-            key=lambda x: (x.sus_scores[method], x.c_complexity), reverse=True
-        )
-        # store the sorted list as an attribute
-        self.sorted_lines = all_lines
-        return all_lines
-
     def print_report(self, methods: List[str], items_num: int):
         """Print a nicely formatted suspiciousness report using the chosen method."""
         for method_name in methods:
@@ -170,6 +159,7 @@ class Spectrum:
                 "Line number",
                 "Tarantula Score",
                 "Ochiai Score",
+                "Ochiai2 Score",
                 "Dstar Score",
             ]
             with open("afluent_report.csv", "w+", encoding="utf-8") as outfile:
@@ -178,8 +168,49 @@ class Spectrum:
                 lines_list = list(map(lambda x: x.as_csv(), self.sorted_lines))
                 csv_writer.writerows(lines_list)
 
+        elif report_type == "eval":
+            self.produce_full_eval_report()
         else:
             raise Exception(f"Error:Unknown report type {report_type}.")
+
+    def produce_full_eval_report(self):
+        for method in METHOD_NAMES:
+            for tiebreaker in TIEBREAKERS:
+                ranked_lines = Spectrum.generate_rankings(
+                    self.sorted_lines, method, tiebreaker=tiebreaker
+                )
+                file_to_store = f"{method}_{tiebreaker}_report.csv"
+                header = ["Path", "Line number", f"{method} score"]
+                with open(file_to_store, "w+", encoding="utf-8") as outfile:
+                    csv_writer = csv.writer(outfile)
+                    csv_writer.writerow(header)
+                    lines_list = list(
+                        map(
+                            lambda x: [x.path, x.number, x.sus_scores[method]],
+                            ranked_lines,
+                        )
+                    )
+                    csv_writer.writerows(lines_list)
+
+    @staticmethod
+    def generate_rankings(
+        all_lines: List[line.Line], method: str, tiebreaker="random"
+    ) -> List[line.Line]:
+        """Return a list of line objects ranked from the most to least suspicious.
+
+        Args:
+            method (str): name of the suspiciousness score to use for sorting
+        """
+        # TODO: add tiebreaker here
+
+        # Introduce some randomness before sorting
+        random.shuffle(all_lines)
+        # TODO: change how sorting is based off of
+        all_lines.sort(
+            key=lambda x: (x.sus_scores[method], x.c_complexity), reverse=True
+        )
+        # store the sorted list as an attribute
+        return all_lines
 
     @staticmethod
     def calculate_severity(method: str, sus_score: float, rank: int, out_of: int):

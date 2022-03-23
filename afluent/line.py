@@ -79,13 +79,13 @@ class Line:
 
     def as_csv(self):
         """Return line information as csv writable list."""
-        # TODO: update with the new score
-        # TODO: update upstream as well
+        # TODO: include other info maybe
         return [
             self.path,
             self.number,
             self.sus_scores[TARAN],
             self.sus_scores[OCHIAI],
+            self.sus_scores[OCHIAI2],
             self.sus_scores[DSTAR],
         ]
 

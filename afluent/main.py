@@ -88,7 +88,7 @@ def pytest_addoption(parser):
         action="store",
         default=None,
         type=str,
-        choices=["json", "csv"],
+        choices=["json", "csv", "eval"],
         help="Store report after AFLuent run.",
     )
     afluent_group.addoption(
@@ -97,6 +97,7 @@ def pytest_addoption(parser):
         action="store_true",
         help="Get per test case coverage report.",
     )
+    # TODO: remove complexity args
     afluent_group.addoption(
         "--cyclomatic-complexity",
         dest="c_complexity",
@@ -111,6 +112,8 @@ def pytest_addoption(parser):
         action="store_true",
         help="enable tie breaking using syntax complexity.",
     )
+    # TODO: add tiebreaker args
+    # TODO: add metadata report for session duration
 
 
 def pytest_cmdline_main(config):
