@@ -43,9 +43,7 @@ class ProjFile:
                     # get the complexity of the line
                     line_obj.tiebreakers[
                         "cyclomatic"
-                    ] = ProjFile.get_cyclomatic_complexity_score(
-                        line_number, self.cyclomatic_complexity_data
-                    )
+                    ] = self.cyclomatic_complexity_data[line_number]
                 if self.logical_tiebreak_data:
                     # TODO: put the data into the line tiebreaker
                     pass
@@ -93,22 +91,3 @@ class ProjFile:
         for line_num, line_obj in self.lines.items():
             data_dictionary[str(line_num)] = line_obj.as_dict()
         return data_dictionary
-
-    @staticmethod
-    def get_cyclomatic_complexity_score(line_num, dataset) -> int:
-        """Search for the correct line range in the dataset and return the complexity score.
-
-        Args:
-            line_num (int): number of the line being searched for
-            dataset (List[Tuple[int, int, int]]): Dataset of line number ranges
-            and their complexity
-
-        Returns:
-            int: the complexity of the line or 0 if the line wasn't found
-        """
-        if not dataset:
-            return 0
-        for line_range in dataset:
-            if line_range[0] <= line_num <= line_range[1]:
-                return line_range[2]
-        return 0

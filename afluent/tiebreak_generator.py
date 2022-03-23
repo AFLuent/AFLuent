@@ -201,7 +201,7 @@ COMPLEXITY_FUNC = {
 
 
 # pylint: disable=R0903
-class SyntaxtComplexityGenerator:
+class SyntaxComplexityGenerator:
     """Store the full syntax complexity data set and call the finder."""
 
     def __init__(self, file_path: str) -> None:
@@ -229,18 +229,21 @@ class CyclomaticComplexityGenerator:
     def __init__(self, file_path) -> None:
         """Initialize the generator."""
         self.path = file_path
-        self.data: List[Tuple[int, int, int]] = []
+        self.data: Dict[int, int] = {}
 
     def calculate_syntax_complexity(self):
         """Get the full dataset for cyclomatic complexity."""
         with open(self.path, "r", encoding="utf-8") as infile:
             file_string = infile.read()
+            lines_num = len(file_string.splitlines())
             complexity_data = cc.sorted_results(cc.cc_visit(file_string), cc.LINES)
+        filler_dict = {i: 0 for i in range(1, lines_num + 1)}
         # reassemble complexity data to follow this format
         # List(Tuple(line_start:int, line_end:int, complexity_score:int))
-        cc_lines = []
         for item in complexity_data:
             # Check if the current item is a Function and add it's information
             if isinstance(item, radon.visitors.Function):
-                cc_lines.append((item.lineno, item.endline, item.complexity))
-        self.data = cc_lines
+                # fill the filler_dict with the complexity score
+                for number in range(item.lineno, item.endline + 1):
+                    filler_dict[number] = item.complexity
+        self.data = filler_dict
