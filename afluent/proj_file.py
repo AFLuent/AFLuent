@@ -17,6 +17,7 @@ class ProjFile:
         """
         self.name = name
         self.lines: Dict[int, line.Line] = {}
+        # TODO: refactor the names here
         self.cyclomatic_complexity_data: List[Tuple[int, int, int]] = []
         self.syntax_complexity_data: Dict[int, List[Dict[str, Any]]] = {}
 
@@ -90,7 +91,6 @@ class ProjFile:
         """
         if not dataset:
             return 0
-        # TODO: refactor to use binary search
         for line_range in dataset:
             if line_range[0] <= line_num <= line_range[1]:
                 return line_range[2]

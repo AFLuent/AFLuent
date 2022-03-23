@@ -45,6 +45,13 @@ def pytest_addoption(parser):
         help="Enable fault localization using Ochiai",
     )
     afluent_group.addoption(
+        "--ochiai2",
+        dest="afl_methods",
+        action="append_const",
+        const="ochiai2",
+        help="Enable fault localization using Ochiai2",
+    )
+    afluent_group.addoption(
         "--dstar",
         dest="afl_methods",
         action="append_const",
@@ -160,23 +167,22 @@ class Afluent:
         self.c_complexity = pytest_config.getoption("c_complexity")
         self.s_complexity = pytest_config.getoption("s_complexity")
         self.session_spectrum = {}
-
-    @pytest.hookimpl(hookwrapper=True)
-    def pytest_pyfunc_call(self, pyfuncitem):
-        """Calculate the coverage of each test case and add it to spectrum."""
-        # TODO: try initializing the object in the __init__ function
-        cov = coverage.Coverage(
+        self.cov = coverage.Coverage(
             data_file=None,
             auto_data=False,
             branch=True,
             config_file=False,
             omit=self.ignore,
         )
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_pyfunc_call(self, pyfuncitem):
+        """Calculate the coverage of each test case and add it to spectrum."""
         try:
-            cov.start()
+            self.cov.start()
             yield
-            cov.stop()
-            coverage_data = cov.get_data()
+            self.cov.stop()
+            coverage_data = self.cov.get_data()
             self.session_spectrum[pyfuncitem.name] = {
                 "coverage": {},
                 "result": "notSet",
@@ -184,10 +190,10 @@ class Afluent:
             for measured_file in coverage_data.measured_files():
                 self.session_spectrum[pyfuncitem.name]["coverage"][
                     measured_file
-                ] = cov.get_data().lines(measured_file)
+                ] = self.cov.get_data().lines(measured_file)
         except coverage.exceptions.CoverageWarning:
             pass
-        cov.erase()
+        self.cov.erase()
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_runtest_makereport(self, item):

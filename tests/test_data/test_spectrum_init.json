@@ -33,7 +33,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -47,7 +48,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -61,7 +63,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -75,7 +78,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -89,7 +93,8 @@
                 "sus_scores": {
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
-                    "dstar": 1.0
+                    "dstar": 1.0,
+                    "ochiai2": 0.5
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -103,7 +108,8 @@
                 "sus_scores": {
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
-                    "dstar": 1.0
+                    "dstar": 1.0,
+                    "ochiai2": 0.5
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -117,7 +123,8 @@
                 "sus_scores": {
                     "tarantula": 1.0,
                     "ochiai": 1.0,
-                    "dstar": 999999999
+                    "dstar": Infinity,
+                    "ochiai2": 1.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -133,7 +140,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -147,7 +155,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -161,7 +170,8 @@
                 "sus_scores": {
                     "tarantula": 0.5,
                     "ochiai": 0.5774,
-                    "dstar": 0.5
+                    "dstar": 0.5,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -175,7 +185,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -189,7 +200,8 @@
                 "sus_scores": {
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
-                    "dstar": 1.0
+                    "dstar": 1.0,
+                    "ochiai2": 0.5
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -203,7 +215,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -217,7 +230,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -231,7 +245,8 @@
                 "sus_scores": {
                     "tarantula": 0.0,
                     "ochiai": 0,
-                    "dstar": 0.0
+                    "dstar": 0.0,
+                    "ochiai2": 0.0
                 },
                 "c_complexity": 0,
                 "s_complexity": 0
@@ -245,7 +260,8 @@
                 "sus_scores": {
                     "tarantula": 0.6667,
                     "ochiai": 0.7071,
-                    "dstar": 1.0
+                    "dstar": 1.0,
+                    "ochiai2": 0.5
                 },
                 "c_complexity": 0,
                 "s_complexity": 0

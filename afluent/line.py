@@ -41,7 +41,6 @@ class Line:
         Args:
             method (str): name of the method to use
         """
-        # TODO: refactor this a bit
         if method.lower() == TARAN:
             self.sus_scores[TARAN] = Line.tarantula(
                 len(self.failed_by),
@@ -57,15 +56,22 @@ class Line:
             self.sus_scores[DSTAR] = Line.dstar(
                 len(self.failed_by), len(self.passed_by), failed_total, power
             )
+        elif method.lower() == OCHIAI2:
+            self.sus_scores[OCHIAI2] = Line.ochiai2(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
     def sus_all(self, passed_total: int, failed_total: int, power=3):
         """Calculate the suspiciousness score for all available methods."""
-        # TODO: refactor this a bit
         self.sus(TARAN, passed_total, failed_total)
         self.sus(OCHIAI, passed_total, failed_total)
         self.sus(DSTAR, passed_total, failed_total, power=power)
+        self.sus(OCHIAI2, passed_total, failed_total)
 
     def as_dict(self):
         """Return line information as json writable dictionary."""
@@ -73,6 +79,8 @@ class Line:
 
     def as_csv(self):
         """Return line information as csv writable list."""
+        # TODO: update with the new score
+        # TODO: update upstream as well
         return [
             self.path,
             self.number,
@@ -179,8 +187,8 @@ class Line:
         if total_passed == 0:
             return 1.0
         if total_uncover == 0:
-            # TODO: unsure here
-            pass
+            # TODO: unsure here, just added this as a quick patch up
+            total_uncover = 1
         numerator = failed_cover * passed_uncover
         denominator = math.sqrt(
             total_cover * total_uncover * total_failed * total_passed

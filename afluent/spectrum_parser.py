@@ -11,7 +11,7 @@ from tabulate import tabulate
 from afluent import proj_file, line
 
 
-METHOD_NAMES = ["tarantula", "ochiai", "dstar"]
+METHOD_NAMES = ["tarantula", "ochiai", "ochiai2", "dstar"]
 
 PALETTE = {
     "severe": fg.white + fx.bold + bg.lightred,
@@ -66,8 +66,8 @@ class Spectrum:
             for method_score in sus_scores:
                 current_row.append(f"{format_function(str(method_score))}")
             # TODO: remove complexity from display
-            current_row.append(str(line_obj.c_complexity))
-            current_row.append(str(line_obj.s_complexity))
+            # current_row.append(str(line_obj.c_complexity))
+            # current_row.append(str(line_obj.s_complexity))
             report_list.append(tuple(current_row))
         return report_list
 
@@ -123,7 +123,7 @@ class Spectrum:
             all_lines.extend(file_obj.lines.values())
         # Introduce some randomness before sorting
         random.shuffle(all_lines)
-        # TODO: incorporate both types of complexity if necessary
+        # TODO: change how sorting is based off of
         all_lines.sort(
             key=lambda x: (x.sus_scores[method], x.c_complexity), reverse=True
         )
@@ -145,8 +145,8 @@ class Spectrum:
         for method_name in methods:
             table_headers.append(PALETTE["location_line"](f"{method_name} Score"))
         # TODO: remove these two headers
-        table_headers.append(PALETTE["location_line"]("C_Complexity"))
-        table_headers.append(PALETTE["location_line"]("S_Complexity"))
+        # table_headers.append(PALETTE["location_line"]("C_Complexity"))
+        # table_headers.append(PALETTE["location_line"]("S_Complexity"))
         print(f"{PALETTE['location_line'](header_text)}")
         print(
             tabulate(
@@ -193,10 +193,9 @@ class Spectrum:
         """
         if sus_score <= 0:
             return PALETTE["safe"]
-        if (method in ["tarantula", "ochiai"]) and sus_score == 1:
+        if (method in ["tarantula", "ochiai", "ochiai2"]) and sus_score == 1:
             return PALETTE["severe"]
-        # TODO: might need updated
-        if method == "dstar" and sus_score == 999999999:
+        if method == "dstar" and sus_score == float("inf"):
             return PALETTE["severe"]
         if rank / out_of <= 0.2:
             return PALETTE["risky"]

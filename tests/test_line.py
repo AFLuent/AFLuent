@@ -98,6 +98,7 @@ def test_line_as_dict():
         "sus_scores": {
             "tarantula": -1.0,
             "ochiai": -1.0,
+            "ochiai2": -1.0,
             "dstar": -1.0,
         },
         "c_complexity": 0,

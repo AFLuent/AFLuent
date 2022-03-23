@@ -22,16 +22,6 @@ def test_spectrum_init_empty_config():
     assert spectrum_object.totals == {"passed": 0, "failed": 0, "skipped": 0}
 
 
-# TODO: unclear which tied lines will be placed first
-# def test_spectrum_generate_report(test_data):
-#     """Check that reports are correctly generated."""
-#     config_item = test_data["test_spectrum_init"]["input_config"][0]
-#     spectrum_object = spectrum_parser.Spectrum(config_item)
-#     report_output = spectrum_object.generate_report("ochiai")
-#     expected_report = {}
-#     assert True
-
-
 def test_spectrum_generate_report_throws_error(test_data):
     """Check that error is thrown when unknown method is used."""
     config_item = test_data["test_spectrum_init"]["input_config"][0]
@@ -54,7 +44,7 @@ def test_spectrum_generate_report_throws_error(test_data):
         ("dstar", 0, 1, 1, spectrum_parser.PALETTE["safe"]),
         ("dstar", 0.5, 1, 20, spectrum_parser.PALETTE["risky"]),
         ("dstar", 0.5, 16, 20, spectrum_parser.PALETTE["mild"]),
-        ("dstar", 999999999, 8, 20, spectrum_parser.PALETTE["severe"]),
+        ("dstar", float("inf"), 8, 20, spectrum_parser.PALETTE["severe"]),
     ],
 )
 def test_calculate_severity(method, sus_score, rank, out_of, formatting_func):
