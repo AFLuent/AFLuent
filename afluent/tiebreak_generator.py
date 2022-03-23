@@ -53,7 +53,7 @@ MUTANTS = [
 ]
 
 
-class LocationFinder(cst.CSTVisitor):
+class FullVisitor(cst.CSTVisitor):
     """Locate specific nodes and organize by line number and calculate their complexity."""
 
     METADATA_DEPENDENCIES = (metadata.PositionProvider,)
@@ -137,89 +137,142 @@ class LocationFinder(cst.CSTVisitor):
     # For: not clear, there is target and iter to check but they're relatively low complexity
     # With: check node.items
 
-    @staticmethod
-    def count_mutants(node):
-        """Count the number of possible mutants in a node using the MUTANTS variable."""
-        total = 0
-        for mutant in MUTANTS:
-            total += len(matchers.findall(node, mutant()))
+
+class StatementVisitor(cst.CSTVisitor):
+    """Locate specific nodes and organize by line number and calculate their complexity."""
+
+    METADATA_DEPENDENCIES = (metadata.PositionProvider,)
+
+    def __init__(self, filler_dict: dict) -> None:
+        """Initialize the class as a visitor.
+
+        Args:
+            filler_dict (dict): empty dictionary containing all line numbers of
+            a file.
+        """
+        super().__init__()
+        self.mutants_by_location = filler_dict
+
+    def visit_Return(self, node: cst.Return) -> None:
+        """Store the metadata of return statements when visited."""
+        node_metadata = self.get_node_metadata_dict(node)
+        self.fill_locations_range(node_metadata)
+
+    def visit_SimpleStatementLine(self, node: cst.SimpleStatementLine) -> None:
+        """Store the metadata of general statements when visited."""
+        node_metadata = self.get_node_metadata_dict(node)
+        self.fill_locations_range(node_metadata)
+
+    def get_node_metadata_dict(self, node):
+        """Organize the metadata dictionary."""
+        node_type = type(node).__name__
+        metadata_dict = {
+            "start": self.get_metadata(metadata.PositionProvider, node).start.line,
+            "end": self.get_metadata(metadata.PositionProvider, node).end.line,
+            "type": node_type,
+            "complexity": COMPLEXITY_FUNC[node_type](node),
+        }
+        return metadata_dict
+
+    def fill_locations_range(self, node_metadata):
+        """Distribute the metadata for all nodes in the same block."""
+        start = node_metadata["start"]
+        end = node_metadata["end"]
+        for line_num in range(start, end + 1):
+            if line_num in self.mutants_by_location:
+                self.mutants_by_location[line_num] = node_metadata["complexity"]
+
+
+def count_mutants(node):
+    """Count the number of possible mutants in a node using the MUTANTS variable."""
+    total = 0
+    for mutant in MUTANTS:
+        total += len(matchers.findall(node, mutant()))
+    return total
+
+
+def get_funcdef_complexity(node):
+    """Calculate the complexity of a function definition."""
+    return len(node.params.params)
+
+
+def get_if_complexity(node):
+    """Calculate the complexity of an if statement."""
+    # complexity of if statement= number of mutants in the test condition
+    if node.test:
+        total = count_mutants(node.test)
         return total
+    return 0
 
-    @staticmethod
-    def get_funcdef_complexity(node):
-        """Calculate the complexity of a function definition."""
-        return len(node.params.params)
 
-    @staticmethod
-    def get_if_complexity(node):
-        """Calculate the complexity of an if statement."""
-        # complexity of if statement= number of mutants in the test condition
-        total = LocationFinder.count_mutants(node.test)
+def get_statement_complexity(node):
+    """Calculate the complexity of a general statement."""
+    # Complexity of a statement = number of mutants
+    total = count_mutants(node)
+    return total
+
+
+def get_return_complexity(node):
+    """Calculate the complexity of a return statement."""
+    if node.value:
+        total = count_mutants(node.value)
         return total
+    return 0
 
-    @staticmethod
-    def get_statement_complexity(node):
-        """Calculate the complexity of a general statement."""
-        # Complexity of a statement = number of mutants
-        total = LocationFinder.count_mutants(node)
+
+def get_while_complexity(node):
+    """Calculate the complexity of a while loop."""
+    if node.test:
+        total = count_mutants(node.test)
         return total
+    return 0
 
-    @staticmethod
-    def get_return_complexity(node):
-        """Calculate the complexity of a return statement."""
-        total = LocationFinder.count_mutants(node.value)
+
+def get_for_complexity(node):
+    """Calculate the complexity of a for loop."""
+    # TODO: implement me
+    return 0
+
+
+def get_with_complexity(node):
+    """Calculate the complexity of a with statement."""
+    if node.items:
+        total = count_mutants(node.items)
         return total
-
-    @staticmethod
-    def get_while_complexity(node):
-        """Calculate the complexity of a while loop."""
-        total = LocationFinder.count_mutants(node.test)
-        return total
-
-    @staticmethod
-    def get_for_complexity(node):
-        """Calculate the complexity of a for loop."""
-        # TODO: implement me
-        return 0
-
-    @staticmethod
-    def get_with_complexity(node):
-        """Calculate the complexity of a with statement."""
-        total = LocationFinder.count_mutants(node.items)
-        return total
+    return 0
 
 
 COMPLEXITY_FUNC = {
-    "FunctionDef": LocationFinder.get_funcdef_complexity,
-    "If": LocationFinder.get_if_complexity,
-    "SimpleStatementLine": LocationFinder.get_statement_complexity,
-    "Return": LocationFinder.get_return_complexity,
-    "While": LocationFinder.get_while_complexity,
-    "For": LocationFinder.get_for_complexity,
-    "With": LocationFinder.get_with_complexity,
+    "FunctionDef": get_funcdef_complexity,
+    "If": get_if_complexity,
+    "SimpleStatementLine": get_statement_complexity,
+    "Return": get_return_complexity,
+    "While": get_while_complexity,
+    "For": get_for_complexity,
+    "With": get_with_complexity,
 }
 
 
 # pylint: disable=R0903
-class SyntaxComplexityGenerator:
+class LogicalTieBreaker:
     """Store the full syntax complexity data set and call the finder."""
 
     def __init__(self, file_path: str) -> None:
         """Initialize the generator."""
         self.path = file_path
-        self.data: Dict[int, List[Dict[str, Any]]] = {}
+        self.data: Dict[int, int] = {}
 
-    def calculate_syntax_complexity(self):
+    def calculate_mutant_density(self):
         """Get the full file complexity dataset."""
         with open(self.path, "r", encoding="utf-8") as infile:
             file_text = infile.read()
             module_obj = cst.parse_module(file_text)
         lines_num = len(file_text.splitlines())
-        filler_dict = {i: [] for i in range(1, lines_num + 1)}
+        filler_dict = {i: 0 for i in range(1, lines_num + 1)}
         wrapper = metadata.MetadataWrapper(module_obj)
-        finder = LocationFinder(filler_dict)
+        finder = StatementVisitor(filler_dict)
         wrapper.visit(finder)
-        self.data = finder.contents_by_location
+        self.data = finder.mutants_by_location
 
 
 # pylint: disable=R0903

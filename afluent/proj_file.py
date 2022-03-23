@@ -18,8 +18,8 @@ class ProjFile:
         self.name = name
         self.lines: Dict[int, line.Line] = {}
         # TODO: refactor the names here
-        self.cyclomatic_complexity_data: List[Tuple[int, int, int]] = []
-        self.logical_tiebreak_data = {}
+        self.cyclomatic_complexity_data: Dict[int, int] = {}
+        self.logical_tiebreak_data: Dict[int, int] = {}
         self.enhanced_tiebreak_data = {}
 
     def update_file(
@@ -45,7 +45,9 @@ class ProjFile:
                         "cyclomatic"
                     ] = self.cyclomatic_complexity_data[line_number]
                 if self.logical_tiebreak_data:
-                    # TODO: put the data into the line tiebreaker
+                    line_obj.tiebreakers["logical"] = self.logical_tiebreak_data[
+                        line_number
+                    ]
                     pass
                 if self.enhanced_tiebreak_data:
                     # TODO: put the data into the line tiebreaker
@@ -71,16 +73,14 @@ class ProjFile:
 
     def get_logical_tiebreaker_dataset(self):
         """Use tiebreak generator to get the logical tiebreaker dataset."""
-        pass
-        # TODO: refactor this
-        # s_generator = tiebreak_generator.SyntaxtComplexityGenerator(self.name)
-        # s_generator.calculate_syntax_complexity()
-        # self.syntax_complexity_data = s_generator.data
+        mutant_density_generator = tiebreak_generator.LogicalTieBreaker(self.name)
+        mutant_density_generator.calculate_mutant_density()
+        self.logical_tiebreak_data = mutant_density_generator.data
 
     def get_enhanced_tiebreaker_dataset(self):
         """Use tiebreak generator to get the enhanced tiebreaker dataset."""
-        pass
         # TODO: refactor this
+        pass
         # s_generator = tiebreak_generator.SyntaxtComplexityGenerator(self.name)
         # s_generator.calculate_syntax_complexity()
         # self.syntax_complexity_data = s_generator.data
