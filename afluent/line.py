@@ -5,6 +5,7 @@ from typing import List
 
 TARAN = "tarantula"
 OCHIAI = "ochiai"
+OCHIAI2 = "ochiai2"
 DSTAR = "dstar"
 
 
@@ -28,7 +29,9 @@ class Line:
             TARAN: -1.0,
             OCHIAI: -1.0,
             DSTAR: -1.0,
+            OCHIAI2: -1.0,
         }
+        # TODO: refactor naming of complexity
         self.c_complexity = 0
         self.s_complexity = 0
 
@@ -100,10 +103,6 @@ class Line:
         Returns:
             float: suspiciousness score using tarantula
         """
-        # TODO: double check if this should happen
-        # FIXME: this if statement will set uncovered statements to be very
-        # suspicious
-        # TODO: make sure test cases check all possible inputs
         if total_passed == 0:
             return 1
         if total_failed == 0:
@@ -125,7 +124,6 @@ class Line:
         Returns:
             float: suspiciousness score using ochiai
         """
-        # TODO: double check if this should happen
         if total_failed == 0 or failed_cover == 0:
             return 0
         score = failed_cover / math.sqrt(total_failed * (passed_cover + failed_cover))
@@ -147,9 +145,44 @@ class Line:
             float: suspiciousness score using dstar
         """
         uncovered_failed = total_failed - failed_cover
-        # TODO: double check if this should happen
         if passed_cover + uncovered_failed == 0:
-            # TODO: change this to return the maximum integer value
-            return 999999999
+            # TODO: update this in the thesis description
+            return float("inf")
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
+
+    def ochiai2(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
+        """Calculate suspiciousness score using the ochiai2 approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+            total_failed (int): total number of failed test cases
+
+        Returns:
+            float: suspiciousness score using ochiai2
+        """
+        # !DIVISION BY ZERO WHEN
+        # ?If there are no tests that cover the statement: not happening, we're
+        # only looking at covered statements to begin with
+        # !If there are no tests that do not cover the statement: UNSURE
+        # ?If the total failed is zero: not possible, for AFLuent to run, there
+        # has to be at least one failure
+        # ?If total passed is zero => everything is suspicious, no info really
+        passed_uncover = total_passed - passed_cover
+        failed_uncover = total_failed - failed_cover
+        total_cover = passed_cover + failed_cover
+        total_uncover = passed_uncover + failed_uncover
+        if total_passed == 0:
+            return 1.0
+        if total_uncover == 0:
+            # TODO: unsure here
+            pass
+        numerator = failed_cover * passed_uncover
+        denominator = math.sqrt(
+            total_cover * total_uncover * total_failed * total_passed
+        )
+        return numerator / denominator
