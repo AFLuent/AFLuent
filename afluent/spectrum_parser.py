@@ -26,9 +26,8 @@ PALETTE = {
 class Spectrum:
     """Store all the information for individual files and lines coverage."""
 
-    # TODO: add tiebreaker type
     def __init__(
-        self, config, dstar_pow=3, c_complexity=False, s_complexity=False
+        self, config, dstar_pow=3, tiebreaker="random", eval_mode=False
     ) -> None:
         """Initialize a spectrum object.
 
@@ -41,8 +40,8 @@ class Spectrum:
         self.sorted_lines: List[line.Line] = []
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
         self.dstar_pow = dstar_pow
-        self.c_complexity = c_complexity
-        self.s_complexity = s_complexity
+        self.tiebreaker = tiebreaker
+        self.eval_mode = eval_mode
         self.reassemble()
         self.calculate_sus()
 
@@ -74,9 +73,6 @@ class Spectrum:
             )
             for method_score in sus_scores:
                 current_row.append(f"{format_function(str(method_score))}")
-            # TODO: remove complexity from display
-            # current_row.append(str(line_obj.c_complexity))
-            # current_row.append(str(line_obj.s_complexity))
             report_list.append(tuple(current_row))
         return report_list
 
@@ -94,11 +90,22 @@ class Spectrum:
                 if file_name not in self.reassembled_data:
                     # Initialize a new object of one doesn't already exist
                     file_obj = proj_file.ProjFile(file_name)
-                    if self.c_complexity:
-                        # calculate it's complexity dataset
-                        file_obj.get_cyclomatic_complexity_dataset()
-                    if self.s_complexity:
-                        file_obj.get_syntax_complexity_dataset()
+                    # TODO: get tie breaker datasets
+                    if self.eval_mode:
+                        # populate all tieberaker datasets
+                        file_obj.get_logical_tiebreaker_dataset()
+                        file_obj.get_enhanced_tiebreaker_dataset()
+                        file_obj.get_cyclomatic_tiebreaker_dataset()
+                    elif self.tiebreaker == "logical":
+                        # collect logical tiebreak dataset only
+                        file_obj.get_logical_tiebreaker_dataset()
+                    elif self.tiebreaker == "enhanced":
+                        # collect enhanced tiebreak dataset only
+                        file_obj.get_enhanced_tiebreaker_dataset()
+                    elif self.tiebreaker == "cyclomatic":
+                        # collect cyclometer dataset only
+                        file_obj.get_cyclomatic_tiebreaker_dataset()
+                    # * Random tiebreaker doesn't need dataset
                     self.reassembled_data[file_name] = file_obj
                 self.reassembled_data[file_name].update_file(
                     lines_covered, test_result, test_case_name
@@ -133,9 +140,6 @@ class Spectrum:
         ]
         for method_name in methods:
             table_headers.append(PALETTE["location_line"](f"{method_name} Score"))
-        # TODO: remove these two headers
-        # table_headers.append(PALETTE["location_line"]("C_Complexity"))
-        # table_headers.append(PALETTE["location_line"]("S_Complexity"))
         print(f"{PALETTE['location_line'](header_text)}")
         print(
             tabulate(
@@ -180,13 +184,23 @@ class Spectrum:
                     self.sorted_lines, method, tiebreaker=tiebreaker
                 )
                 file_to_store = f"{method}_{tiebreaker}_report.csv"
-                header = ["Path", "Line number", f"{method} score"]
+                header = [
+                    "Path",
+                    "Line number",
+                    f"{method} score",
+                    f"{tiebreaker} score",
+                ]
                 with open(file_to_store, "w+", encoding="utf-8") as outfile:
                     csv_writer = csv.writer(outfile)
                     csv_writer.writerow(header)
                     lines_list = list(
                         map(
-                            lambda x: [x.path, x.number, x.sus_scores[method]],
+                            lambda x: [
+                                x.path,
+                                x.number,
+                                x.sus_scores[method],
+                                x.tiebreakers[tiebreaker],
+                            ],
                             ranked_lines,
                         )
                     )
@@ -201,14 +215,21 @@ class Spectrum:
         Args:
             method (str): name of the suspiciousness score to use for sorting
         """
-        # TODO: add tiebreaker here
-
         # Introduce some randomness before sorting
         random.shuffle(all_lines)
-        # TODO: change how sorting is based off of
-        all_lines.sort(
-            key=lambda x: (x.sus_scores[method], x.c_complexity), reverse=True
-        )
+        # If random, just sort by the sus scores
+        if tiebreaker == "random":
+            all_lines.sort(
+                key=lambda x: x.sus_scores[method],
+                reverse=True,
+            )
+        # Otherwise, use the tiebreaker scores
+        else:
+            all_lines.sort(
+                key=lambda x: (x.sus_scores[method], x.tiebreakers[tiebreaker]),
+                reverse=True,
+            )
+
         # store the sorted list as an attribute
         return all_lines
 

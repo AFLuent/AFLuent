@@ -97,23 +97,15 @@ def pytest_addoption(parser):
         action="store_true",
         help="Get per test case coverage report.",
     )
-    # TODO: remove complexity args
     afluent_group.addoption(
-        "--cyclomatic-complexity",
-        dest="c_complexity",
-        default=False,
-        action="store_true",
-        help="enable tie breaking using cyclomatic complexity.",
+        "--tiebreaker",
+        dest="tiebreaker",
+        action="store",
+        default="random",
+        type=str,
+        choices=["random", "cyclomatic", "logical", "enhanced"],
+        help="Type of tie breaking approach.",
     )
-    afluent_group.addoption(
-        "--syntax-complexity",
-        dest="s_complexity",
-        default=False,
-        action="store_true",
-        help="enable tie breaking using syntax complexity.",
-    )
-    # TODO: add tiebreaker args
-    # TODO: add metadata report for session duration
 
 
 def pytest_cmdline_main(config):
@@ -167,8 +159,11 @@ class Afluent:
         self.ignore = pytest_config.getoption("afl_ignore")
         self.report = pytest_config.getoption("report_type")
         self.per_test = pytest_config.getoption("per_test")
-        self.c_complexity = pytest_config.getoption("c_complexity")
-        self.s_complexity = pytest_config.getoption("s_complexity")
+        self.tiebreaker = pytest_config.getoption("tiebreaker")
+        if self.report == "eval":
+            self.eval_mode = True
+        else:
+            self.eval_mode = False
         self.session_spectrum = {}
         self.cov = coverage.Coverage(
             data_file=None,
@@ -228,8 +223,8 @@ class Afluent:
             full_spectrum = spectrum_parser.Spectrum(
                 self.session_spectrum,
                 dstar_pow=self.dstar_pow,
-                c_complexity=self.c_complexity,
-                s_complexity=self.s_complexity,
+                tiebreaker=self.tiebreaker,
+                eval_mode=self.eval_mode,
             )
             full_spectrum.print_report(self.methods, self.results_num)
             if self.report:

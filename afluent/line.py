@@ -3,11 +3,18 @@
 import math
 from typing import List
 
+# Scores:
 TARAN = "tarantula"
 OCHIAI = "ochiai"
 OCHIAI2 = "ochiai2"
 DSTAR = "dstar"
 
+
+# Tiebreakers
+RANDOM = "random"
+CYCLOMATIC = "cyclomatic"
+LOGICAL = "logical"
+ENHANCED = "enhanced"
 
 # pylint: disable=R0902
 class Line:
@@ -30,6 +37,13 @@ class Line:
             OCHIAI: -1.0,
             DSTAR: -1.0,
             OCHIAI2: -1.0,
+        }
+        self.tiebreakers = {
+            CYCLOMATIC: 0,
+            LOGICAL: 0,
+            ENHANCED: 0,
+            # *SHOULD ALWAYS STAY ZERO
+            RANDOM: 0,
         }
         # TODO: refactor naming of complexity
         self.c_complexity = 0

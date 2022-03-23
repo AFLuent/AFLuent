@@ -1,7 +1,7 @@
 """Create object oriented structure for files carrying line coverage information."""
 from typing import Any, Dict, List, Tuple
 
-from afluent import complexity_generator
+from afluent import tiebreak_generator
 
 from afluent import line
 
@@ -19,7 +19,8 @@ class ProjFile:
         self.lines: Dict[int, line.Line] = {}
         # TODO: refactor the names here
         self.cyclomatic_complexity_data: List[Tuple[int, int, int]] = []
-        self.syntax_complexity_data: Dict[int, List[Dict[str, Any]]] = {}
+        self.logical_tiebreak_data = {}
+        self.enhanced_tiebreak_data = {}
 
     def update_file(
         self, covered_lines: list[int], test_result: str, test_case_name: str
@@ -40,11 +41,18 @@ class ProjFile:
                 line_obj = line.Line(self.name, line_number)
                 if self.cyclomatic_complexity_data:
                     # get the complexity of the line
-                    line_obj.c_complexity = ProjFile.get_cyclomatic_complexity_score(
+                    line_obj.tiebreakers[
+                        "cyclomatic"
+                    ] = ProjFile.get_cyclomatic_complexity_score(
                         line_number, self.cyclomatic_complexity_data
                     )
+                if self.logical_tiebreak_data:
+                    # TODO: put the data into the line tiebreaker
+                    pass
+                if self.enhanced_tiebreak_data:
+                    # TODO: put the data into the line tiebreaker
+                    pass
                 # TODO: implement how syntax complexity should be retrieved
-                # if self.syntax_complexity_data:
 
                 self.lines[line_number] = line_obj
             if test_result == "passed":
@@ -56,19 +64,28 @@ class ProjFile:
             else:
                 raise Exception(f"Unknown test result for {test_case_name}")
 
-    def get_cyclomatic_complexity_dataset(self):
-        """Use the file path to calculate complexity and update the data."""
+    def get_cyclomatic_tiebreaker_dataset(self):
+        """Use the file path to calculate cyclomatic complexity and update the data."""
         # set cyclomatic complexity to be enabled
-        cc_generator = complexity_generator.CyclomaticComplexityGenerator(self.name)
+        cc_generator = tiebreak_generator.CyclomaticComplexityGenerator(self.name)
         cc_generator.calculate_syntax_complexity()
         self.cyclomatic_complexity_data = cc_generator.data
 
-    def get_syntax_complexity_dataset(self):
-        """Use complexity generator to get the syntax complexity dataset."""
-        s_generator = complexity_generator.SyntaxtComplexityGenerator(self.name)
-        s_generator.calculate_syntax_complexity()
-        # TODO: change what gets used here
-        self.syntax_complexity_data = s_generator.data
+    def get_logical_tiebreaker_dataset(self):
+        """Use tiebreak generator to get the logical tiebreaker dataset."""
+        pass
+        # TODO: refactor this
+        # s_generator = tiebreak_generator.SyntaxtComplexityGenerator(self.name)
+        # s_generator.calculate_syntax_complexity()
+        # self.syntax_complexity_data = s_generator.data
+
+    def get_enhanced_tiebreaker_dataset(self):
+        """Use tiebreak generator to get the enhanced tiebreaker dataset."""
+        pass
+        # TODO: refactor this
+        # s_generator = tiebreak_generator.SyntaxtComplexityGenerator(self.name)
+        # s_generator.calculate_syntax_complexity()
+        # self.syntax_complexity_data = s_generator.data
 
     def as_dict(self):
         """Return lines as a json writable dictionary."""
