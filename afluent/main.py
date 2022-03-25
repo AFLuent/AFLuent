@@ -153,7 +153,7 @@ class Afluent:
         self.methods = pytest_config.getoption("afl_methods")
         # if no methods were passed, include all of them
         if not self.methods:
-            self.methods = ["dstar", "tarantula", "ochiai"]
+            self.methods = ["dstar", "tarantula", "ochiai", "ochiai2"]
         self.dstar_pow = pytest_config.getoption("dstar_pow")
         self.results_num = pytest_config.getoption("results_num")
         self.ignore = pytest_config.getoption("afl_ignore")

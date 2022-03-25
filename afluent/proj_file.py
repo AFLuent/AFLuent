@@ -80,7 +80,7 @@ class ProjFile:
         """Use tiebreak generator to get the enhanced tiebreaker dataset."""
         generator = tiebreak_generator.EnhancedTieBreaker(self.name)
         generator.calculate_mutant_density()
-        self.logical_tiebreak_data = generator.score
+        self.enhanced_tiebreak_data = generator.score
 
     def as_dict(self):
         """Return lines as a json writable dictionary."""

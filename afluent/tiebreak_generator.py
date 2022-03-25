@@ -162,6 +162,8 @@ class FullVisitor(cst.CSTVisitor):
         # avoid division by zero
         if statement_num == 0:
             statement_num += 1
+        if other_num == 0:
+            other_num += 1
         score = ((statement_sum / statement_num) + (other_sum / other_num)) / 2
         return round(score, 5)
 
@@ -216,9 +218,10 @@ class FullVisitor(cst.CSTVisitor):
     @staticmethod
     def get_with_complexity(node):
         """Calculate the complexity of a with statement."""
+        total = 0
         if node.items:
-            total = FullVisitor.count_mutants(node.items, ENHANCED_MUTANTS)
-            return total
+            for with_item in node.items:
+                total += FullVisitor.count_mutants(with_item, ENHANCED_MUTANTS)
         return 0
 
 
