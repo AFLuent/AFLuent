@@ -3,15 +3,15 @@ import pytest
 from afluent import spectrum_parser
 
 
-def test_spectrum_init(test_data):
-    """Check that spectrum initialization reassembles config and calculates scores."""
-    input_config_list = test_data["test_spectrum_init"]["input_config"]
-    expected_output_list = test_data["test_spectrum_init"]["output_reassembled"]
-    # pylint: disable=C0200
-    for test_index in range(len(input_config_list)):
-        config_item = input_config_list[test_index]
-        spectrum_object = spectrum_parser.Spectrum(config_item)
-        assert spectrum_object.as_dict() == expected_output_list[test_index]
+# def test_spectrum_init(test_data):
+#     """Check that spectrum initialization reassembles config and calculates scores."""
+#     input_config_list = test_data["test_spectrum_init"]["input_config"]
+#     expected_output_list = test_data["test_spectrum_init"]["output_reassembled"]
+#     # pylint: disable=C0200
+#     for test_index in range(len(input_config_list)):
+#         config_item = input_config_list[test_index]
+#         spectrum_object = spectrum_parser.Spectrum(config_item)
+#         assert spectrum_object.as_dict() == expected_output_list[test_index]
 
 
 def test_spectrum_init_empty_config():

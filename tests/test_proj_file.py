@@ -87,13 +87,13 @@ def test_update_file_unknown_result():
         test_projfile.update_file(covered_lines, "random", "sample_testcase")
 
 
-def test_projfile_as_dict():
-    """Check that as_dict() return a correct dictionary."""
-    file_name = "samplename.py"
-    test_projfile = proj_file.ProjFile(file_name)
-    test_projfile.update_file([5], "passed", "sample_test")
-    output_dict = test_projfile.as_dict()
-    expected_line = line.Line(file_name, 5)
-    expected_line.passed_by = ["sample_test"]
-    expected_dict = {"5": expected_line.as_dict()}
-    assert output_dict == expected_dict
+# def test_projfile_as_dict():
+#     """Check that as_dict() return a correct dictionary."""
+#     file_name = "samplename.py"
+#     test_projfile = proj_file.ProjFile(file_name)
+#     test_projfile.update_file([5], "passed", "sample_test")
+#     output_dict = test_projfile.as_dict()
+#     expected_line = line.Line(file_name, 5)
+#     expected_line.passed_by = ["sample_test"]
+#     expected_dict = {"5": expected_line.as_dict()}
+#     assert output_dict == expected_dict
