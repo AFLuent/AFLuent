@@ -198,6 +198,11 @@ class Line:
         if total_uncover == 0:
             # TODO: unsure here, just added this as a quick patch up
             total_uncover = 1
+        # TODO: FIX THESE
+        if total_failed == 0:
+            return 0
+        if total_cover == 0:
+            return 0
         numerator = failed_cover * passed_uncover
         denominator = math.sqrt(
             total_cover * total_uncover * total_failed * total_passed

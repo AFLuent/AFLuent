@@ -181,12 +181,13 @@ class Afluent:
             yield
             self.cov.stop()
             coverage_data = self.cov.get_data()
-            self.session_spectrum[pyfuncitem.name] = {
+            item_key = f"{pyfuncitem.parent.name}_{pyfuncitem.name}"
+            self.session_spectrum[item_key] = {
                 "coverage": {},
                 "result": "notSet",
             }
             for measured_file in coverage_data.measured_files():
-                self.session_spectrum[pyfuncitem.name]["coverage"][
+                self.session_spectrum[item_key]["coverage"][
                     measured_file
                 ] = self.cov.get_data().lines(measured_file)
         except coverage.exceptions.CoverageWarning:
@@ -197,8 +198,9 @@ class Afluent:
     def pytest_runtest_makereport(self, item):
         """Store the outcome of the test case as passed, failed, or skipped."""
         outcome = yield
-        if outcome.get_result().when == "call" and item.name in self.session_spectrum:
-            self.session_spectrum[item.name]["result"] = outcome.get_result().outcome
+        item_key = f"{item.parent.name}_{item.name}"
+        if outcome.get_result().when == "call" and item_key in self.session_spectrum:
+            self.session_spectrum[item_key]["result"] = outcome.get_result().outcome
 
     def pytest_sessionfinish(self, exitstatus):
         """Perform the spectrum analysis if at least one test fails."""
