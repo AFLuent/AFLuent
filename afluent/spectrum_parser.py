@@ -54,9 +54,10 @@ class Spectrum:
         all_lines: List[line.Line] = []
         for file_obj in self.reassembled_data.values():
             all_lines.extend(file_obj.lines.values())
-        # TODO: pass the tie breaker here
         # Sort the lines based on the first method name used in the list
-        sorted_lines = Spectrum.generate_rankings(all_lines, methods[0])
+        sorted_lines = Spectrum.generate_rankings(
+            all_lines, methods[0], tiebreaker=self.tiebreaker
+        )
         # store as an instance variable to generate reports later
         self.sorted_lines = sorted_lines
         if max_items > 0:
@@ -90,7 +91,6 @@ class Spectrum:
                 if file_name not in self.reassembled_data:
                     # Initialize a new object of one doesn't already exist
                     file_obj = proj_file.ProjFile(file_name)
-                    # TODO: get tie breaker datasets
                     if self.eval_mode:
                         # populate all tieberaker datasets
                         file_obj.get_logical_tiebreaker_dataset()

@@ -8,49 +8,62 @@ import radon  # type: ignore[import]
 import radon.complexity as cc  # type: ignore[import]
 
 MUTANTS = [
-    cst.BitInvert,
-    cst.Not,
-    cst.Minus,
-    cst.Plus,
-    cst.And,
-    cst.Or,
-    cst.Add,
-    cst.BitAnd,
-    cst.BitOr,
-    cst.BitXor,
-    cst.Divide,
-    cst.FloorDivide,
-    cst.LeftShift,
-    cst.MatrixMultiply,
-    cst.Modulo,
-    cst.Multiply,
-    cst.Power,
-    cst.RightShift,
-    cst.Subtract,
-    cst.Equal,
-    cst.GreaterThan,
-    cst.GreaterThanEqual,
-    cst.In,
-    cst.Is,
-    cst.LessThan,
-    cst.LessThanEqual,
-    cst.NotEqual,
-    cst.IsNot,
-    cst.NotIn,
-    cst.AddAssign,
-    cst.BitAndAssign,
-    cst.BitOrAssign,
-    cst.BitXorAssign,
-    cst.DivideAssign,
-    cst.FloorDivideAssign,
-    cst.LeftShiftAssign,
-    cst.MatrixMultiplyAssign,
-    cst.ModuloAssign,
-    cst.MultiplyAssign,
-    cst.PowerAssign,
-    cst.RightShiftAssign,
-    cst.SubtractAssign,
+    matchers.BitInvert,
+    matchers.Not,
+    matchers.Minus,
+    matchers.Plus,
+    matchers.And,
+    matchers.Or,
+    matchers.Add,
+    matchers.BitAnd,
+    matchers.BitOr,
+    matchers.BitXor,
+    matchers.Divide,
+    matchers.FloorDivide,
+    matchers.LeftShift,
+    matchers.MatrixMultiply,
+    matchers.Modulo,
+    matchers.Multiply,
+    matchers.Power,
+    matchers.RightShift,
+    matchers.Subtract,
+    matchers.Equal,
+    matchers.GreaterThan,
+    matchers.GreaterThanEqual,
+    matchers.In,
+    matchers.Is,
+    matchers.LessThan,
+    matchers.LessThanEqual,
+    matchers.NotEqual,
+    matchers.IsNot,
+    matchers.NotIn,
+    matchers.AddAssign,
+    matchers.BitAndAssign,
+    matchers.BitOrAssign,
+    matchers.BitXorAssign,
+    matchers.DivideAssign,
+    matchers.FloorDivideAssign,
+    matchers.LeftShiftAssign,
+    matchers.MatrixMultiplyAssign,
+    matchers.ModuloAssign,
+    matchers.MultiplyAssign,
+    matchers.PowerAssign,
+    matchers.RightShiftAssign,
+    matchers.SubtractAssign,
 ]
+
+ENHANCED_MUTANTS = [
+    matchers.AnnAssign,
+    matchers.Assign,
+    matchers.Call,
+    matchers.Subscript,
+    matchers.Tuple,
+    matchers.List,
+    matchers.SimpleString,
+    matchers.Dict,
+    matchers.Integer,
+    matchers.Float,
+] + MUTANTS
 
 
 class FullVisitor(cst.CSTVisitor):
@@ -66,7 +79,8 @@ class FullVisitor(cst.CSTVisitor):
             a file.
         """
         super().__init__()
-        self.contents_by_location = filler_dict
+        self.mutants_by_location = filler_dict
+        self.score: Dict[int, float] = {}
 
     def visit_If(self, node: cst.If) -> None:
         """Store the metadata of if statements when visited."""
@@ -75,11 +89,6 @@ class FullVisitor(cst.CSTVisitor):
 
     def visit_FunctionDef(self, node: cst.FunctionDef) -> None:
         """Store the metadata of function definition when visited."""
-        node_metadata = self.get_node_metadata_dict(node)
-        self.fill_locations_range(node_metadata)
-
-    def visit_Return(self, node: cst.Return) -> None:
-        """Store the metadata of return statements when visited."""
         node_metadata = self.get_node_metadata_dict(node)
         self.fill_locations_range(node_metadata)
 
@@ -111,8 +120,6 @@ class FullVisitor(cst.CSTVisitor):
             "end": self.get_metadata(metadata.PositionProvider, node).end.line,
             "type": node_type,
             "complexity": COMPLEXITY_FUNC[node_type](node),
-            # TODO: remove this
-            # "node": node,
         }
         return metadata_dict
 
@@ -121,21 +128,108 @@ class FullVisitor(cst.CSTVisitor):
         start = node_metadata["start"]
         end = node_metadata["end"]
         for line_num in range(start, end + 1):
-            if line_num in self.contents_by_location:
-                self.contents_by_location[line_num].append(node_metadata)
+            if line_num in self.mutants_by_location:
+                self.mutants_by_location[line_num].append(node_metadata)
 
-    # complexity calculation:
-    # number of mutant density in statement
-    # number of arguments in a function
+    def calculate_score(self):
+        """Iterate through the collected data and generate a score for each line."""
+        for key, value in self.mutants_by_location.items():
+            self.score[key] = FullVisitor.get_average_score(value)
 
-    # Define complexity for:
-    # FunctionDef: simply call match the number of parameters in node.params
-    # If: check node.test, check if node.orelse exists and parse that too
-    # SimpleStatementLine: match all its children
-    # Return: match node.value
-    # While: check node.test
-    # For: not clear, there is target and iter to check but they're relatively low complexity
-    # With: check node.items
+    @staticmethod
+    def get_average_score(items_list: List[Dict[str, Any]]) -> float:
+        """Calculate the average score for a single line
+
+        Args:
+            items_list (List[Dict[str, Any]]): List of nodes with their
+           information
+
+        Returns:
+            float: score for the line
+        """
+        statement_sum = 0
+        statement_num = 0
+        other_sum = 0
+        other_num = 0
+        # iterate through the list in a reverse order
+        for item in items_list[::-1]:
+            if item["type"] == "SimpleStatementLine":
+                statement_sum += item["complexity"]
+                statement_num += 1
+            else:
+                other_sum += item["complexity"]
+                other_num += 1
+        # avoid division by zero
+        if statement_num == 0:
+            statement_num += 1
+        score = ((statement_sum / statement_num) + (other_sum / other_num)) / 2
+        return round(score, 5)
+
+    @staticmethod
+    def count_mutants(node, mutant_set):
+        """Count the number of possible mutants in a node using the MUTANTS variable."""
+        total = 0
+        for mutant in mutant_set:
+            total += len(matchers.findall(node, mutant()))
+        return total
+
+    @staticmethod
+    def get_funcdef_complexity(node):
+        """Calculate the complexity of a function definition."""
+        return len(node.params.params)
+
+    @staticmethod
+    def get_if_complexity(node):
+        """Calculate the complexity of an if statement."""
+        # complexity of if statement= number of mutants in the test condition
+        if node.test:
+            total = FullVisitor.count_mutants(node.test, ENHANCED_MUTANTS)
+            return total
+        return 0
+
+    @staticmethod
+    def get_statement_complexity(node):
+        """Calculate the complexity of a general statement."""
+        # Complexity of a statement = number of mutants
+        total = FullVisitor.count_mutants(node, ENHANCED_MUTANTS)
+        return total
+
+    @staticmethod
+    def get_while_complexity(node):
+        """Calculate the complexity of a while loop."""
+        if node.test:
+            total = FullVisitor.count_mutants(node.test, ENHANCED_MUTANTS)
+            return total
+        return 0
+
+    @staticmethod
+    def get_for_complexity(node):
+        """Calculate the complexity of a for loop."""
+        target_mutants = 0
+        iterable_mutants = 0
+        if node.target:
+            target_mutants = FullVisitor.count_mutants(node.target, ENHANCED_MUTANTS)
+        if node.iter:
+            iterable_mutants = FullVisitor.count_mutants(node.iter, ENHANCED_MUTANTS)
+        return target_mutants + iterable_mutants
+
+    @staticmethod
+    def get_with_complexity(node):
+        """Calculate the complexity of a with statement."""
+        if node.items:
+            total = FullVisitor.count_mutants(node.items, ENHANCED_MUTANTS)
+            return total
+        return 0
+
+
+COMPLEXITY_FUNC = {
+    "FunctionDef": FullVisitor.get_funcdef_complexity,
+    "If": FullVisitor.get_if_complexity,
+    "SimpleStatementLine": FullVisitor.get_statement_complexity,
+    "While": FullVisitor.get_while_complexity,
+    "For": FullVisitor.get_for_complexity,
+    "With": FullVisitor.get_with_complexity,
+}
 
 
 class StatementVisitor(cst.CSTVisitor):
@@ -153,11 +247,6 @@ class StatementVisitor(cst.CSTVisitor):
         super().__init__()
         self.mutants_by_location = filler_dict
 
-    def visit_Return(self, node: cst.Return) -> None:
-        """Store the metadata of return statements when visited."""
-        node_metadata = self.get_node_metadata_dict(node)
-        self.fill_locations_range(node_metadata)
-
     def visit_SimpleStatementLine(self, node: cst.SimpleStatementLine) -> None:
         """Store the metadata of general statements when visited."""
         node_metadata = self.get_node_metadata_dict(node)
@@ -170,8 +259,11 @@ class StatementVisitor(cst.CSTVisitor):
             "start": self.get_metadata(metadata.PositionProvider, node).start.line,
             "end": self.get_metadata(metadata.PositionProvider, node).end.line,
             "type": node_type,
-            "complexity": COMPLEXITY_FUNC[node_type](node),
         }
+        if node_type == "SimpleStatementLine":
+            metadata_dict["complexity"] = StatementVisitor.get_statement_complexity(
+                node
+            )
         return metadata_dict
 
     def fill_locations_range(self, node_metadata):
@@ -182,88 +274,58 @@ class StatementVisitor(cst.CSTVisitor):
             if line_num in self.mutants_by_location:
                 self.mutants_by_location[line_num] = node_metadata["complexity"]
 
-
-def count_mutants(node):
-    """Count the number of possible mutants in a node using the MUTANTS variable."""
-    total = 0
-    for mutant in MUTANTS:
-        total += len(matchers.findall(node, mutant()))
-    return total
-
-
-def get_funcdef_complexity(node):
-    """Calculate the complexity of a function definition."""
-    return len(node.params.params)
-
-
-def get_if_complexity(node):
-    """Calculate the complexity of an if statement."""
-    # complexity of if statement= number of mutants in the test condition
-    if node.test:
-        total = count_mutants(node.test)
+    @staticmethod
+    def get_statement_complexity(node):
+        """Calculate the complexity of a general statement."""
+        # Complexity of a statement = number of mutants
+        total = StatementVisitor.count_mutants(node)
         return total
-    return 0
 
-
-def get_statement_complexity(node):
-    """Calculate the complexity of a general statement."""
-    # Complexity of a statement = number of mutants
-    total = count_mutants(node)
-    return total
-
-
-def get_return_complexity(node):
-    """Calculate the complexity of a return statement."""
-    if node.value:
-        total = count_mutants(node.value)
+    @staticmethod
+    def count_mutants(node):
+        """Count the number of possible mutants in a node using the MUTANTS variable."""
+        total = 0
+        for mutant in MUTANTS:
+            total += len(matchers.findall(node, mutant()))
         return total
-    return 0
-
-
-def get_while_complexity(node):
-    """Calculate the complexity of a while loop."""
-    if node.test:
-        total = count_mutants(node.test)
-        return total
-    return 0
-
-
-def get_for_complexity(node):
-    """Calculate the complexity of a for loop."""
-    # TODO: implement me
-    return 0
-
-
-def get_with_complexity(node):
-    """Calculate the complexity of a with statement."""
-    if node.items:
-        total = count_mutants(node.items)
-        return total
-    return 0
-
-
-COMPLEXITY_FUNC = {
-    "FunctionDef": get_funcdef_complexity,
-    "If": get_if_complexity,
-    "SimpleStatementLine": get_statement_complexity,
-    "Return": get_return_complexity,
-    "While": get_while_complexity,
-    "For": get_for_complexity,
-    "With": get_with_complexity,
-}
 
 
 # pylint: disable=R0903
-class LogicalTieBreaker:
-    """Store the full syntax complexity data set and call the finder."""
+class EnhancedTieBreaker:
+    """Store the full syntax mutant density data set and call the finder."""
 
     def __init__(self, file_path: str) -> None:
         """Initialize the generator."""
         self.path = file_path
-        self.data: Dict[int, int] = {}
+        self.data: Dict[int, List[Dict[str, Any]]] = {}
+        self.score: Dict[int, float] = {}
 
     def calculate_mutant_density(self):
-        """Get the full file complexity dataset."""
+        """Get the full file mutant density dataset."""
+        with open(self.path, "r", encoding="utf-8") as infile:
+            file_text = infile.read()
+            module_obj = cst.parse_module(file_text)
+        lines_num = len(file_text.splitlines())
+        filler_dict = {i: [] for i in range(1, lines_num + 1)}
+        wrapper = metadata.MetadataWrapper(module_obj)
+        finder = FullVisitor(filler_dict)
+        wrapper.visit(finder)
+        self.data = finder.mutants_by_location
+        finder.calculate_score()
+        self.score = finder.score
+
+
+# pylint: disable=R0903
+class LogicalTieBreaker:
+    """Store the full syntax mutant density data set and call the finder."""
+
+    def __init__(self, file_path: str) -> None:
+        """Initialize the generator."""
+        self.path = file_path
+        self.score: Dict[int, int] = {}
+
+    def calculate_mutant_density(self):
+        """Get the full file mutant density dataset."""
         with open(self.path, "r", encoding="utf-8") as infile:
             file_text = infile.read()
             module_obj = cst.parse_module(file_text)
@@ -272,7 +334,7 @@ class LogicalTieBreaker:
         wrapper = metadata.MetadataWrapper(module_obj)
         finder = StatementVisitor(filler_dict)
         wrapper.visit(finder)
-        self.data = finder.mutants_by_location
+        self.score = finder.mutants_by_location
 
 
 # pylint: disable=R0903

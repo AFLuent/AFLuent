@@ -45,9 +45,6 @@ class Line:
             # *SHOULD ALWAYS STAY ZERO
             RANDOM: 0,
         }
-        # TODO: refactor naming of complexity
-        self.c_complexity = 0
-        self.s_complexity = 0
 
     def sus(self, method: str, passed_total: int, failed_total: int, power=3):
         """Calculate the suspiciousness score using the passed method.
@@ -93,7 +90,6 @@ class Line:
 
     def as_csv(self):
         """Return line information as csv writable list."""
-        # TODO: include other info maybe
         return [
             self.path,
             self.number,
@@ -168,7 +164,6 @@ class Line:
         """
         uncovered_failed = total_failed - failed_cover
         if passed_cover + uncovered_failed == 0:
-            # TODO: update this in the thesis description
             return float("inf")
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
@@ -207,4 +202,5 @@ class Line:
         denominator = math.sqrt(
             total_cover * total_uncover * total_failed * total_passed
         )
-        return numerator / denominator
+        score = numerator / denominator
+        return round(score, 4)
