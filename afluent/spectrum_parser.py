@@ -218,7 +218,8 @@ class Spectrum:
         # If random, just sort by the sus scores
         if tiebreaker == "random":
             # Introduce some randomness before sorting
-            # TODO: set the seed for evaluation
+            # TODO: remove the seed seeting after evaluation
+            random.seed(214200)
             random.shuffle(all_lines)
             all_lines.sort(
                 key=lambda x: x.sus_scores[method],
