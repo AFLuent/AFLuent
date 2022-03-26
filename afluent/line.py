@@ -196,9 +196,7 @@ class Line:
         if total_passed == 0:
             return 1.0
         if total_uncover == 0:
-            # TODO: unsure here, just added this as a quick patch up
-            total_uncover = 1
-        # TODO: FIX THESE
+            return 0
         if total_failed == 0:
             return 0
         if total_cover == 0:

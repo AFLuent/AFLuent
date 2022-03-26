@@ -72,7 +72,6 @@ def test_dstar(failed_cover, passed_cover, total_failed, power, expected_score):
     [
         (3, 0, 0, 6, 1),
         (0, 0, 7, 0, 0),
-        # TODO: needs changed after fix
         (3, 3, 3, 3, 0),
         (0, 0, 5, 5, 0),
         (3, 2, 7, 6, 0.366),

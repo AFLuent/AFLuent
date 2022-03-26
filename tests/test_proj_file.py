@@ -87,6 +87,46 @@ def test_update_file_unknown_result():
         test_projfile.update_file(covered_lines, "random", "sample_testcase")
 
 
+def test_get_datasets():
+    """Check that all tiebreaker datasets can be populated. Regardless of accuracy."""
+    test_projfile = proj_file.ProjFile("./tests/test_data/sample_file.py")
+    assert not test_projfile.cyclomatic_complexity_data
+    assert not test_projfile.logical_tiebreak_data
+    assert not test_projfile.enhanced_tiebreak_data
+    test_projfile.get_cyclomatic_tiebreaker_dataset()
+    test_projfile.get_logical_tiebreaker_dataset()
+    test_projfile.get_enhanced_tiebreaker_dataset()
+    assert test_projfile.cyclomatic_complexity_data
+    assert test_projfile.logical_tiebreak_data
+    assert test_projfile.enhanced_tiebreak_data
+    covered_lines = [5, 6, 7, 9]
+    test_projfile.update_file(covered_lines, "failed", "sample_testcase")
+    assert test_projfile.lines[5].tiebreakers == {
+        "cyclomatic": 4,
+        "logical": 0,
+        "enhanced": 3.0,
+        "random": 0,
+    }
+    assert test_projfile.lines[6].tiebreakers == {
+        "cyclomatic": 4,
+        "logical": 3,
+        "enhanced": 4.5,
+        "random": 0,
+    }
+    assert test_projfile.lines[7].tiebreakers == {
+        "cyclomatic": 4,
+        "logical": 1,
+        "enhanced": 3.0,
+        "random": 0,
+    }
+    assert test_projfile.lines[9].tiebreakers == {
+        "cyclomatic": 4,
+        "logical": 0,
+        "enhanced": 5,
+        "random": 0,
+    }
+
+
 # def test_projfile_as_dict():
 #     """Check that as_dict() return a correct dictionary."""
 #     file_name = "samplename.py"

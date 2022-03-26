@@ -215,10 +215,11 @@ class Spectrum:
         Args:
             method (str): name of the suspiciousness score to use for sorting
         """
-        # Introduce some randomness before sorting
-        random.shuffle(all_lines)
         # If random, just sort by the sus scores
         if tiebreaker == "random":
+            # Introduce some randomness before sorting
+            # TODO: set the seed for evaluation
+            random.shuffle(all_lines)
             all_lines.sort(
                 key=lambda x: x.sus_scores[method],
                 reverse=True,
@@ -229,7 +230,6 @@ class Spectrum:
                 key=lambda x: (x.sus_scores[method], x.tiebreakers[tiebreaker]),
                 reverse=True,
             )
-
         # store the sorted list as an attribute
         return all_lines
 
