@@ -9,7 +9,7 @@ from console import bg, fg, fx  # type: ignore[import]
 
 from afluent import spectrum_parser
 
-from pprint import pprint
+from time import time
 
 WARNING = fx.bold + fg.white + bg.orange
 ERROR = fx.bold + fg.white + bg.red
@@ -20,7 +20,6 @@ CONFLICTING_PLUGINS = ["pytest_cov"]
 
 def pytest_addoption(parser):
     """Add AFLuent command line group and arguments to accept."""
-    # TODO: figure out what other arguments are needed
     afluent_group = parser.getgroup("afluent", "Automated Fault Localization (AFLuent)")
     afluent_group.addoption(
         "--afl-debug",
@@ -202,8 +201,12 @@ class Afluent:
         if outcome.get_result().when == "call" and item_key in self.session_spectrum:
             self.session_spectrum[item_key]["result"] = outcome.get_result().outcome
 
-    def pytest_sessionfinish(self, exitstatus):
+    def pytest_sessionfinish(self, session, exitstatus):
         """Perform the spectrum analysis if at least one test fails."""
+        test_end_time = time()
+        reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+        test_time = round(test_end_time - reporter._sessionstarttime, 6)
+        localization_time = 0
         # Store generated json
         if self.per_test:
             with open(
@@ -222,13 +225,19 @@ class Afluent:
                 "\n\nFailing tests detected. Diagnosing using AFLuent..."
             )
             print(f"{exit_message}")
+            start_time = time()
             full_spectrum = spectrum_parser.Spectrum(
                 self.session_spectrum,
                 dstar_pow=self.dstar_pow,
                 tiebreaker=self.tiebreaker,
                 eval_mode=self.eval_mode,
             )
+            end_time = time()
+            localization_time = round(end_time - start_time, 6)
             full_spectrum.print_report(self.methods, self.results_num)
             if self.report:
                 print(f"Storing {self.report} report...")
                 full_spectrum.store_report(self.report)
+        timings = {"test_time": test_time, "localization_time": localization_time}
+        with open("timings.json", "w+", encoding="utf-8") as outfile:
+            json.dump(timings, outfile, indent=4)
