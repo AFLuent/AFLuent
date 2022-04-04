@@ -16,6 +16,7 @@ CYCLOMATIC = "cyclomatic"
 LOGICAL = "logical"
 ENHANCED = "enhanced"
 
+
 # pylint: disable=R0902
 class Line:
     """Implement the line object and suspiciousness calculation."""
@@ -39,11 +40,11 @@ class Line:
             OCHIAI2: -1.0,
         }
         self.tiebreakers = {
-            CYCLOMATIC: 0,
-            LOGICAL: 0,
-            ENHANCED: 0,
+            CYCLOMATIC: 0.0,
+            LOGICAL: 0.0,
+            ENHANCED: 0.0,
             # *SHOULD ALWAYS STAY ZERO
-            RANDOM: 0,
+            RANDOM: 0.0,
         }
 
     def sus(self, method: str, passed_total: int, failed_total: int, power=3):
@@ -168,6 +169,7 @@ class Line:
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
 
+    @staticmethod
     def ochiai2(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
     ) -> float:

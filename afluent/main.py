@@ -1,15 +1,14 @@
 """Define Pytest Hooks that run AFLuent."""
 
-from gettext import install
 import json
 
+from time import time
 import coverage  # type: ignore[import]
 import pytest  # type: ignore[import]
 from console import bg, fg, fx  # type: ignore[import]
 
 from afluent import spectrum_parser
 
-from time import time
 
 WARNING = fx.bold + fg.white + bg.orange
 ERROR = fx.bold + fg.white + bg.red
@@ -137,7 +136,8 @@ def pytest_cmdline_main(config):
     else:
         print(
             WARNING(
-                "\nAFLuent is disabled. Enable AFLuent by adding --afl or --afl-debug to the test command."
+                "\nAFLuent is disabled. Enable AFLuent by adding "
+                "--afl or --afl-debug to the test command."
             )
         )
         print()
@@ -205,6 +205,7 @@ class Afluent:
         """Perform the spectrum analysis if at least one test fails."""
         test_end_time = time()
         reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+        # pylint: disable=W0212
         test_time = round(test_end_time - reporter._sessionstarttime, 6)
         localization_time = 0
         # Store generated json
@@ -239,5 +240,5 @@ class Afluent:
                 print(f"Storing {self.report} report...")
                 full_spectrum.store_report(self.report)
         timings = {"test_time": test_time, "localization_time": localization_time}
-        with open("timings.json", "w+", encoding="utf-8") as outfile:
+        with open("afluent_timings.json", "w+", encoding="utf-8") as outfile:
             json.dump(timings, outfile, indent=4)

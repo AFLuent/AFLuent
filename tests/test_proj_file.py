@@ -99,31 +99,31 @@ def test_get_datasets():
     assert test_projfile.cyclomatic_complexity_data
     assert test_projfile.logical_tiebreak_data
     assert test_projfile.enhanced_tiebreak_data
-    covered_lines = [5, 6, 7, 9]
+    covered_lines = [6, 7, 8, 10]
     test_projfile.update_file(covered_lines, "failed", "sample_testcase")
-    assert test_projfile.lines[5].tiebreakers == {
-        "cyclomatic": 4,
-        "logical": 0,
-        "enhanced": 3.0,
-        "random": 0,
-    }
     assert test_projfile.lines[6].tiebreakers == {
         "cyclomatic": 4,
-        "logical": 3,
-        "enhanced": 4.5,
+        "logical": 0.0,
+        "enhanced": 3.0,
         "random": 0,
     }
     assert test_projfile.lines[7].tiebreakers == {
         "cyclomatic": 4,
+        "logical": 3,
+        "enhanced": 4.5,
+        "random": 0.0,
+    }
+    assert test_projfile.lines[8].tiebreakers == {
+        "cyclomatic": 4,
         "logical": 1,
         "enhanced": 3.0,
-        "random": 0,
+        "random": 0.0,
     }
-    assert test_projfile.lines[9].tiebreakers == {
+    assert test_projfile.lines[10].tiebreakers == {
         "cyclomatic": 4,
-        "logical": 0,
+        "logical": 0.0,
         "enhanced": 5,
-        "random": 0,
+        "random": 0.0,
     }
 
 

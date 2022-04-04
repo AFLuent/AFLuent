@@ -1,5 +1,5 @@
 """Create object oriented structure for files carrying line coverage information."""
-from typing import Any, Dict, List, Tuple
+from typing import Dict
 
 from afluent import tiebreak_generator
 
@@ -47,7 +47,6 @@ class ProjFile:
                     line_obj.tiebreakers["logical"] = self.logical_tiebreak_data[
                         line_number
                     ]
-                    pass
                 if self.enhanced_tiebreak_data:
                     line_obj.tiebreakers["enhanced"] = self.enhanced_tiebreak_data[
                         line_number

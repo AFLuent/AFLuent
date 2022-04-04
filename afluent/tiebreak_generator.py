@@ -1,6 +1,6 @@
 """Define complexity generators and criteria to calculate complexity."""
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 import libcst as cst
 from libcst import metadata
 from libcst import matchers
@@ -138,7 +138,7 @@ class FullVisitor(cst.CSTVisitor):
 
     @staticmethod
     def get_average_score(items_list: List[Dict[str, Any]]) -> float:
-        """Calculate the average score for a single line
+        """Calculate the average score for a single line.
 
         Args:
             items_list (List[Dict[str, Any]]): List of nodes with their

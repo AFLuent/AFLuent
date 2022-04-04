@@ -119,32 +119,8 @@ def test_line_sus_unknown():
         test_line.sus("random", 5, 5)
 
 
-# TODO: deal with this
-# def test_line_as_dict():
-#     """Check that as_dict() return a correct dictionary."""
-#     test_line = line.Line("sample/path/to/file.py", 14)
-#     test_line.passed_by = ["test1", "test2"]
-#     test_line.failed_by = ["test3", "test4", "test5"]
-#     output_dict = test_line.as_dict()
-#     expected_dict = {
-#         "path": "sample/path/to/file.py",
-#         "number": 14,
-#         "passed_by": ["test1", "test2"],
-#         "failed_by": ["test3", "test4", "test5"],
-#         "skipped_by": [],
-#         "sus_scores": {
-#             "tarantula": -1.0,
-#             "ochiai": -1.0,
-#             "ochiai2": -1.0,
-#             "dstar": -1.0,
-#         },
-#         "c_complexity": 0,
-#         "s_complexity": 0,
-#     }
-#     assert output_dict == expected_dict
-
-
 def test_as_csv():
+    """Check that a line is correctly converted to csv format."""
     test_line = line.Line("sample/path/to/file.py", 14)
     assert test_line.as_csv() == ["sample/path/to/file.py", 14, -1, -1, -1, -1]
 
@@ -169,5 +145,4 @@ def test_sus_text():
 
 # def test_something():
 #     """Purposefully fail to check report."""
-#     # TODO: remove me
 #     assert False

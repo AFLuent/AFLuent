@@ -28,6 +28,7 @@ def test_spectrum_generate_report_throws_error(test_data):
 
 
 def test_spectrum_init_eval_mode():
+    """Check that all tiebreaker data is generated in eval mode."""
     config = {
         "test1": {
             "coverage": {"tests/test_data/sample_file.py": [1, 2, 3, 4]},
@@ -47,6 +48,8 @@ def test_spectrum_init_eval_mode():
 
 
 def test_spectrum_init_enhanced_tiebreaker():
+    """Check that only the data for the enhanced tiebreaker is calculated for
+    that mode."""
     config = {
         "test1": {
             "coverage": {"tests/test_data/sample_file.py": [1, 2, 3, 4]},
@@ -66,6 +69,8 @@ def test_spectrum_init_enhanced_tiebreaker():
 
 
 def test_spectrum_init_logical_tiebreaker():
+    """Check that only the data for the logical tiebreaker is calculated for
+    that mode."""
     config = {
         "test1": {
             "coverage": {"tests/test_data/sample_file.py": [1, 2, 3, 4]},
@@ -85,6 +90,8 @@ def test_spectrum_init_logical_tiebreaker():
 
 
 def test_spectrum_init_cyclomatic_tiebreaker():
+    """Check that only the data for the cyclomatic tiebreaker is calculated for
+    that mode."""
     config = {
         "test1": {
             "coverage": {"tests/test_data/sample_file.py": [1, 2, 3, 4]},
@@ -104,6 +111,7 @@ def test_spectrum_init_cyclomatic_tiebreaker():
 
 
 def test_spectrum_print_report_throws_error():
+    """Check that an error is thrown when an unknown report is requested."""
     config = {
         "test1": {
             "coverage": {"tests/test_data/sample_file.py": [1, 2, 3, 4]},
@@ -112,7 +120,7 @@ def test_spectrum_print_report_throws_error():
     }
     spectrum_object = spectrum_parser.Spectrum(config, tiebreaker="cyclomatic")
     with pytest.raises(Exception):
-        spectrum_object.print_report(["something"])
+        spectrum_object.print_report(["something"], items_num=20)
 
 
 @pytest.mark.parametrize(

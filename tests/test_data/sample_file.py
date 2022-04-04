@@ -1,7 +1,8 @@
 """Use module is used for testing purposes only, do not modify."""
+# pylint: disable=C0116, E0602, W0612
 
 
-def some_function(arg1, arg2, arg3, arg4):
+def some_function(arg1, arg2, arg3, arg4):  # noqa
     print("hello world!")
     int1 = arg1 * arg3 / 5 - arg4
     int2 = arg4 ** arg3

@@ -177,7 +177,9 @@ class Spectrum:
         else:
             raise Exception(f"Error:Unknown report type {report_type}.")
 
+    # pylint: disable=W0640
     def produce_full_eval_report(self):
+        """Produce csv reports for all equation tie breaker combinatoins."""
         for method in METHOD_NAMES:
             for tiebreaker in TIEBREAKERS:
                 ranked_lines = Spectrum.generate_rankings(
@@ -218,8 +220,6 @@ class Spectrum:
         # If random, just sort by the sus scores
         if tiebreaker == "random":
             # Introduce some randomness before sorting
-            # TODO: remove the seed seeting after evaluation
-            random.seed(214200)
             random.shuffle(all_lines)
             all_lines.sort(
                 key=lambda x: x.sus_scores[method],
