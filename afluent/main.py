@@ -110,12 +110,11 @@ def pytest_cmdline_main(config):
     """Check if AFLuent is enabled and register the plugin object."""
     # check if the argument to enable afluent exists and create the object with
     # the passed configuration
-    installed_plugins = config.pluginmanager.list_name_plugin()
-    for plugin_name, _ in installed_plugins:
-        if plugin_name in CONFLICTING_PLUGINS:
+    for plugin in CONFLICTING_PLUGINS:
+        if config.pluginmanager.hasplugin(plugin):
             print(
                 WARNING(
-                    f"\n{plugin_name} plugin conflicts with AFLuent, consider disabling\n"
+                    f"\n{plugin} plugin conflicts with AFLuent, consider disabling\n"
                     + "it for this session to get the most accurate fault localization results.\n\n"
                 )
             )
