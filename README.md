@@ -17,11 +17,11 @@
 ## Overview
 
 AFLuent is an automated fault localization tool built as a Pytest plugin.
-It's triggered when one or more test case fails causing it to generate a ranking of
-suspicious statements where the cause of the fault could possibly be. Statements
-are ranked in a descending order based on a score calculated through information
-from code coverage and using one of four supported equations (Tarantula, Ochiai,
-Ochiai2, and DStar).
+It's triggered when one or more test case fails causing it to generate a ranking
+of suspicious statements where the cause of the fault could possibly be.
+Statements are ranked in a descending order based on a score calculated
+through information from code coverage and using one of four supported
+equations (Tarantula, Ochiai, Ochiai2, and DStar).
 
 ## Installation
 
