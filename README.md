@@ -1,3 +1,7 @@
+# A Quick Note
+
+Hi! I'm Michael, and I hope to be making this already existing tool more robust by adding new features and using more algorithms.  Throughout this process, I'll also be making this tool flaky-aware, so it will be conscious of the fact that some test cases can be flaky.  Its exeuction and CLI should be the same, but if anything changes this file will also be updated accordingly.
+
 # AFLuent
 
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat)
