@@ -11,8 +11,8 @@ from tabulate import tabulate
 from afluent import proj_file, line
 
 
-METHOD_NAMES = ["tarantula", "ochiai", "ochiai2", "dstar"]
-TIEBREAKERS = ["random", "cyclomatic", "logical", "enhanced"]
+METHOD_NAMES = ["tarantula", "ochiai", "ochiai2", "dstar"] #formula names
+TIEBREAKERS = ["random", "cyclomatic", "logical", "enhanced"] #tiebreaking approaches
 
 PALETTE = {
     "severe": fg.white + fx.bold + bg.lightred,
@@ -36,7 +36,7 @@ class Spectrum:
             dstar_pow (int): power to use when calculating scores using dstar
         """
         self.config = config
-        self.reassembled_data: Dict[str, proj_file.ProjFile] = {}
+        self.reassembled_data: Dict[str, proj_file.ProjFile] = {} #dictionary of names of files that map to a ProjFile
         self.sorted_lines: List[line.Line] = []
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
         self.dstar_pow = dstar_pow

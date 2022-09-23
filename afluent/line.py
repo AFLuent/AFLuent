@@ -30,10 +30,10 @@ class Line:
         """
         self.path = file_path
         self.number = line_num
-        self.passed_by: List[str] = []
-        self.failed_by: List[str] = []
+        self.passed_by: List[str] = [] # List of test functions that ran this Line and passed
+        self.failed_by: List[str] = [] # the names of those that failed
         self.skipped_by: List[str] = []
-        self.sus_scores = {
+        self.sus_scores = { #default values for our formulas
             TARAN: -1.0,
             OCHIAI: -1.0,
             DSTAR: -1.0,
@@ -53,7 +53,7 @@ class Line:
         Args:
             method (str): name of the method to use
         """
-        if method.lower() == TARAN:
+        if method.lower() == TARAN: # if the method is tarantula, do this
             self.sus_scores[TARAN] = Line.tarantula(
                 len(self.failed_by),
                 len(self.passed_by),
@@ -78,18 +78,18 @@ class Line:
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
-    def sus_all(self, passed_total: int, failed_total: int, power=3):
+    def sus_all(self, passed_total: int, failed_total: int, power=3): #use all formulas
         """Calculate the suspiciousness score for all available methods."""
         self.sus(TARAN, passed_total, failed_total)
         self.sus(OCHIAI, passed_total, failed_total)
         self.sus(DSTAR, passed_total, failed_total, power=power)
         self.sus(OCHIAI2, passed_total, failed_total)
 
-    def as_dict(self):
+    def as_dict(self): #give me the representation of this object as a dictionary
         """Return line information as json writable dictionary."""
         return self.__dict__
 
-    def as_csv(self):
+    def as_csv(self): # give me the representation of this object as a csv
         """Return line information as csv writable list."""
         return [
             self.path,

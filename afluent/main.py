@@ -9,14 +9,15 @@ from console import bg, fg, fx  # type: ignore[import]
 
 from afluent import spectrum_parser
 
-
+# Define colors
 WARNING = fx.bold + fg.white + bg.orange
 ERROR = fx.bold + fg.white + bg.red
 VALID = fx.bold + fg.white + bg.green
 
 CONFLICTING_PLUGINS = ["pytest_cov"]
 
-
+# hook function for pytest to add new command line arguments
+# use argparse to understand (this is the structure)
 def pytest_addoption(parser):
     """Add AFLuent command line group and arguments to accept."""
     afluent_group = parser.getgroup("afluent", "Automated Fault Localization (AFLuent)")
@@ -105,11 +106,10 @@ def pytest_addoption(parser):
         help="Type of tie breaking approach.",
     )
 
-
+# parse the command line arguments
 def pytest_cmdline_main(config):
     """Check if AFLuent is enabled and register the plugin object."""
-    # check if the argument to enable afluent exists and create the object with
-    # the passed configuration
+
     for plugin in CONFLICTING_PLUGINS:
         if config.pluginmanager.hasplugin(plugin):
             print(
@@ -118,10 +118,11 @@ def pytest_cmdline_main(config):
                     + "it for this session to get the most accurate fault localization results.\n\n"
                 )
             )
-
+# check if the argument to enable afluent exists and create the object with
+# the passed configuration
     if config.getoption("afl_enable"):
         # Check if exit after failure is enabled and display warning message
-        if config.getoption("--maxfail"):
+        if config.getoption("--maxfail"): # fail after this many test cases fail
             print(
                 WARNING(
                     "\nExit after failure detected. AFLuent gives more "
@@ -130,8 +131,8 @@ def pytest_cmdline_main(config):
                 )
             )
             print()
-        plugin = Afluent(config)
-        config.pluginmanager.register(plugin, "Afluent")
+        plugin = Afluent(config) #create afluent object
+        config.pluginmanager.register(plugin, "Afluent") #register the plugin under the name afluent
     else:
         print(
             WARNING(
@@ -162,7 +163,7 @@ class Afluent:
             self.eval_mode = True
         else:
             self.eval_mode = False
-        self.session_spectrum = {}
+        self.session_spectrum = {} #dataset to be filled
         self.cov = coverage.Coverage(
             data_file=None,
             auto_data=False,
@@ -171,14 +172,15 @@ class Afluent:
             omit=self.ignore,
         )
 
-    @pytest.hookimpl(hookwrapper=True)
+    @pytest.hookimpl(hookwrapper=True) # runs "around" the test function
     def pytest_pyfunc_call(self, pyfuncitem):
         """Calculate the coverage of each test case and add it to spectrum."""
         try:
             self.cov.start()
-            yield
+            yield # let the test case run even if its parameterized
             self.cov.stop()
-            coverage_data = self.cov.get_data()
+            coverage_data = self.cov.get_data() # get the coverage report for the test that just ran
+            #following is restructuring `coverage_data` and storing it in `session_spectrum`
             item_key = f"{pyfuncitem.parent.name}_{pyfuncitem.name}"
             self.session_spectrum[item_key] = {
                 "coverage": {},
@@ -188,21 +190,23 @@ class Afluent:
                 self.session_spectrum[item_key]["coverage"][
                     measured_file
                 ] = self.cov.get_data().lines(measured_file)
+
         except coverage.exceptions.CoverageWarning:
             pass
+        # erase data so it doesn't persist for the next one
         self.cov.erase()
 
     @pytest.hookimpl(hookwrapper=True)
-    def pytest_runtest_makereport(self, item):
+    def pytest_runtest_makereport(self, item): # a report about whether the test passed or not
         """Store the outcome of the test case as passed, failed, or skipped."""
-        outcome = yield
+        outcome = yield # let the test case run to know the result
         item_key = f"{item.parent.name}_{item.name}"
         if outcome.get_result().when == "call" and item_key in self.session_spectrum:
-            self.session_spectrum[item_key]["result"] = outcome.get_result().outcome
+            self.session_spectrum[item_key]["result"] = outcome.get_result().outcome # update session_spectrum
 
     def pytest_sessionfinish(self, session, exitstatus):
         """Perform the spectrum analysis if at least one test fails."""
-        test_end_time = time()
+        test_end_time = time() #how long does afluent take to run?
         reporter = session.config.pluginmanager.get_plugin("terminalreporter")
         # pylint: disable=W0212
         test_time = round(test_end_time - reporter._sessionstarttime, 6)
@@ -226,7 +230,7 @@ class Afluent:
             )
             print(f"{exit_message}")
             start_time = time()
-            full_spectrum = spectrum_parser.Spectrum(
+            full_spectrum = spectrum_parser.Spectrum( #initialize new Spectrum object
                 self.session_spectrum,
                 dstar_pow=self.dstar_pow,
                 tiebreaker=self.tiebreaker,
