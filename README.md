@@ -71,6 +71,7 @@ command.
 - `--ochiai`: calculate suspiciousness scores using the Ochiai equation
 - `--ochiai2`: calculate suspiciousness scores using the Ochiai2 equation
 - `--dstar`: calculate suspiciousness scores using the DStar equation
+- `--op2`: calculate suspiciousness scores using the Op2 equation
 - `--dstar-pow`: value of `*` to use the the DStar equation, defaults to 3
 - `--tiebreaker`: Approach to use when resolving ties between statements.
   Options: `random`, `cyclomatic`, `logical`, or `enhanced`. Defaults to `random`.
