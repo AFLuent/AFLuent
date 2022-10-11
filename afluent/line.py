@@ -8,7 +8,7 @@ TARAN = "tarantula"
 OCHIAI = "ochiai"
 OCHIAI2 = "ochiai2"
 DSTAR = "dstar"
-OP2 = "op2" # New formula
+OP2 = "op2"  # New formula
 
 
 # Tiebreakers
@@ -31,15 +31,17 @@ class Line:
         """
         self.path = file_path
         self.number = line_num
-        self.passed_by: List[str] = [] # List of test functions that ran this Line and passed
-        self.failed_by: List[str] = [] # the names of those that failed
+        self.passed_by: List[
+            str
+        ] = []  # List of test functions that ran this Line and passed
+        self.failed_by: List[str] = []  # the names of those that failed
         self.skipped_by: List[str] = []
-        self.sus_scores = { #default values for our formulas
+        self.sus_scores = {  # default values for our formulas
             TARAN: -1.0,
             OCHIAI: -1.0,
             DSTAR: -1.0,
             OCHIAI2: -1.0,
-            OP2: -1.0, # New formula
+            OP2: -1.0,  # New formula
         }
         self.tiebreakers = {
             CYCLOMATIC: 0.0,
@@ -55,7 +57,7 @@ class Line:
         Args:
             method (str): name of the method to use
         """
-        if method.lower() == TARAN: # if the method is tarantula, do this
+        if method.lower() == TARAN:  # if the method is tarantula, do this
             self.sus_scores[TARAN] = Line.tarantula(
                 len(self.failed_by),
                 len(self.passed_by),
@@ -77,26 +79,30 @@ class Line:
                 passed_total,
                 failed_total,
             )
-        elif method.lower() == OP2: # New formula
+        elif method.lower() == OP2:  # New formula
             self.sus_scores[OP2] = Line.op2(
-                len(self.failed_by), len(self.passed_by), passed_total,
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
             )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
-    def sus_all(self, passed_total: int, failed_total: int, power=3): #use all formulas
+    def sus_all(
+        self, passed_total: int, failed_total: int, power=3
+    ):  # use all formulas
         """Calculate the suspiciousness score for all available methods."""
         self.sus(TARAN, passed_total, failed_total)
         self.sus(OCHIAI, passed_total, failed_total)
         self.sus(DSTAR, passed_total, failed_total, power=power)
         self.sus(OCHIAI2, passed_total, failed_total)
-        self.sus(OP2, passed_total, failed_total) # New formula
+        self.sus(OP2, passed_total, failed_total)  # New formula
 
-    def as_dict(self): #give me the representation of this object as a dictionary
+    def as_dict(self):  # give me the representation of this object as a dictionary
         """Return line information as json writable dictionary."""
         return self.__dict__
 
-    def as_csv(self): # give me the representation of this object as a csv
+    def as_csv(self):  # give me the representation of this object as a csv
         """Return line information as csv writable list."""
         return [
             self.path,
@@ -105,7 +111,7 @@ class Line:
             self.sus_scores[OCHIAI],
             self.sus_scores[OCHIAI2],
             self.sus_scores[DSTAR],
-            self.sus_scores[OP2], # New formula
+            self.sus_scores[OP2],  # New formula
         ]
 
     def sus_text(self, methods):
@@ -157,7 +163,9 @@ class Line:
         return round(score, 4)
 
     @staticmethod
-    def dstar(failed_cover: int, passed_cover: int, total_failed: int, power=3) -> float:
+    def dstar(
+        failed_cover: int, passed_cover: int, total_failed: int, power=3
+    ) -> float:
         """Calculate suspiciousness score using the dstar approach.
 
         Args:
