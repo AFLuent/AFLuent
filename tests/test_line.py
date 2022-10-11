@@ -11,6 +11,7 @@ def test_globals():
     assert line.OCHIAI == "ochiai"
     assert line.OCHIAI2 == "ochiai2"
     assert line.DSTAR == "dstar"
+    assert line.OP2 == "op2" # New formula
     assert line.RANDOM == "random"
     assert line.CYCLOMATIC == "cyclomatic"
     assert line.LOGICAL == "logical"
@@ -86,6 +87,24 @@ def test_ochiai2(
         == expected_score
     )
 
+# New formula
+@pytest.mark.parametrize(
+    "failed_cover,passed_cover,total_passed,expected_score",
+    [
+        (2, 2, 1, 1),
+        (1, 1, 0, 0),
+        (5, 2, 4, 4.6),
+        (8, 6, 2, 6),
+        (7, 0, 4, 7),
+    ],
+)
+def test_op2(failed_cover, passed_cover, total_passed, expected_score):
+    """Check that the op2 formula is correct."""
+    assert (
+        line.Line.op2(failed_cover, passed_cover, total_passed)
+        == expected_score
+    )
+
 
 def test_line_create():
     """Check that line object can be instantiated correctly."""
@@ -93,7 +112,7 @@ def test_line_create():
     assert test_line.path == "sample/path/to/file.py"
     assert test_line.number == 14
     assert not (test_line.passed_by or test_line.failed_by or test_line.skipped_by)
-    assert list(test_line.sus_scores.values()) == [-1.0, -1.0, -1.0, -1.0]
+    assert list(test_line.sus_scores.values()) == [-1.0, -1.0, -1.0, -1.0, -1.0] # New formula
     assert list(test_line.tiebreakers.values()) == [0, 0, 0, 0]
 
 
@@ -122,7 +141,7 @@ def test_line_sus_unknown():
 def test_as_csv():
     """Check that a line is correctly converted to csv format."""
     test_line = line.Line("sample/path/to/file.py", 14)
-    assert test_line.as_csv() == ["sample/path/to/file.py", 14, -1, -1, -1, -1]
+    assert test_line.as_csv() == ["sample/path/to/file.py", 14, -1, -1, -1, -1, -1]
 
 
 def test_sus_text():
@@ -132,10 +151,12 @@ def test_sus_text():
         "tarantula": 1.0,
         "ochiai": 1.0,
         "dstar": 15.0,
+        "op2": 3.0, # New formula
     }
     assert test_line.sus_text(["tarantula"]) == ("sample/path/to/file.py", 14, [1.0])
     assert test_line.sus_text(["ochiai"]) == ("sample/path/to/file.py", 14, [1.0])
     assert test_line.sus_text(["dstar"]) == ("sample/path/to/file.py", 14, [15.0])
+    assert test_line.sus_text(["op2"]) == ("sample/path/to/file.py", 14, [3.0]) # New formula
     assert test_line.sus_text(["dstar", "tarantula"]) == (
         "sample/path/to/file.py",
         14,
@@ -143,6 +164,6 @@ def test_sus_text():
     )
 
 
-# def test_something():
-#     """Purposefully fail to check report."""
-#     assert False
+def test_something():
+    """Purposefully fail to check report."""
+    assert False

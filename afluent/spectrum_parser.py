@@ -11,7 +11,7 @@ from tabulate import tabulate
 from afluent import proj_file, line
 
 
-METHOD_NAMES = ["tarantula", "ochiai", "ochiai2", "dstar"] #formula names
+METHOD_NAMES = ["tarantula", "ochiai", "ochiai2", "dstar", "op2"] #formula names # New formula
 TIEBREAKERS = ["random", "cyclomatic", "logical", "enhanced"] #tiebreaking approaches
 
 PALETTE = {
@@ -165,6 +165,7 @@ class Spectrum:
                 "Ochiai Score",
                 "Ochiai2 Score",
                 "Dstar Score",
+                "Op2", # New formula
             ]
             with open("afluent_report.csv", "w+", encoding="utf-8") as outfile:
                 csv_writer = csv.writer(outfile)
@@ -246,7 +247,7 @@ class Spectrum:
         """
         if sus_score <= 0:
             return PALETTE["safe"]
-        if (method in ["tarantula", "ochiai", "ochiai2"]) and sus_score == 1:
+        if (method in ["tarantula", "ochiai", "ochiai2", "op2"]) and sus_score == 1: # New formula
             return PALETTE["severe"]
         if method == "dstar" and sus_score == float("inf"):
             return PALETTE["severe"]

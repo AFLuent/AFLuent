@@ -50,6 +50,13 @@ def pytest_addoption(parser):
         const="ochiai2",
         help="Enable fault localization using Ochiai2",
     )
+    afluent_group.addoption( # New formula
+        "--op2",
+        dest="afl_methods",
+        action="append_const",
+        const="op2",
+        help="Enable fault localization using Op2",
+    )
     afluent_group.addoption(
         "--dstar",
         dest="afl_methods",
@@ -152,7 +159,7 @@ class Afluent:
         self.methods = pytest_config.getoption("afl_methods")
         # if no methods were passed, include all of them
         if not self.methods:
-            self.methods = ["dstar", "tarantula", "ochiai", "ochiai2"]
+            self.methods = ["dstar", "tarantula", "ochiai", "ochiai2", "op2"] # New formula
         self.dstar_pow = pytest_config.getoption("dstar_pow")
         self.results_num = pytest_config.getoption("results_num")
         self.ignore = pytest_config.getoption("afl_ignore")

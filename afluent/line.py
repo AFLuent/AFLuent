@@ -8,6 +8,7 @@ TARAN = "tarantula"
 OCHIAI = "ochiai"
 OCHIAI2 = "ochiai2"
 DSTAR = "dstar"
+OP2 = "op2" # New formula
 
 
 # Tiebreakers
@@ -38,6 +39,7 @@ class Line:
             OCHIAI: -1.0,
             DSTAR: -1.0,
             OCHIAI2: -1.0,
+            OP2: -1.0, # New formula
         }
         self.tiebreakers = {
             CYCLOMATIC: 0.0,
@@ -75,6 +77,10 @@ class Line:
                 passed_total,
                 failed_total,
             )
+        elif method.lower() == OP2: # New formula
+            self.sus_scores[OP2] = Line.op2(
+                len(self.failed_by), len(self.passed_by), passed_total,
+            )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
@@ -84,6 +90,7 @@ class Line:
         self.sus(OCHIAI, passed_total, failed_total)
         self.sus(DSTAR, passed_total, failed_total, power=power)
         self.sus(OCHIAI2, passed_total, failed_total)
+        self.sus(OP2, passed_total, failed_total) # New formula
 
     def as_dict(self): #give me the representation of this object as a dictionary
         """Return line information as json writable dictionary."""
@@ -98,6 +105,7 @@ class Line:
             self.sus_scores[OCHIAI],
             self.sus_scores[OCHIAI2],
             self.sus_scores[DSTAR],
+            self.sus_scores[OP2], # New formula
         ]
 
     def sus_text(self, methods):
@@ -108,9 +116,7 @@ class Line:
         return (self.path, self.number, sus_list)
 
     @staticmethod
-    def tarantula(
-        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
-    ) -> float:
+    def tarantula(failed_cover: int, passed_cover: int, total_passed: int, total_failed: int) -> float:
         """Calculate suspiciousness score using the tarantula approach.
 
         Args:
@@ -149,9 +155,7 @@ class Line:
         return round(score, 4)
 
     @staticmethod
-    def dstar(
-        failed_cover: int, passed_cover: int, total_failed: int, power=3
-    ) -> float:
+    def dstar(failed_cover: int, passed_cover: int, total_failed: int, power=3) -> float:
         """Calculate suspiciousness score using the dstar approach.
 
         Args:
@@ -169,10 +173,24 @@ class Line:
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
 
+    # New formula
     @staticmethod
-    def ochiai2(
-        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
-    ) -> float:
+    def op2(failed_cover: int, passed_cover: int, total_passed: int) -> float:
+        """Calculate suspiciousness score using the op2 approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+
+        Returns:
+            float: suspiciousness score using op2
+        """
+        score = failed_cover - (passed_cover / (total_passed + 1))
+        return round(score, 4)
+
+    @staticmethod
+    def ochiai2(failed_cover: int, passed_cover: int, total_passed: int, total_failed: int) -> float:
         """Calculate suspiciousness score using the ochiai2 approach.
 
         Args:
