@@ -164,6 +164,6 @@ def test_sus_text():
     )
 
 
-def test_something():
-    """Purposefully fail to check report."""
-    assert False
+# def test_something():
+#     """Purposefully fail to check report."""
+#     assert False
