@@ -116,7 +116,9 @@ class Line:
         return (self.path, self.number, sus_list)
 
     @staticmethod
-    def tarantula(failed_cover: int, passed_cover: int, total_passed: int, total_failed: int) -> float:
+    def tarantula(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
         """Calculate suspiciousness score using the tarantula approach.
 
         Args:
@@ -190,7 +192,9 @@ class Line:
         return round(score, 4)
 
     @staticmethod
-    def ochiai2(failed_cover: int, passed_cover: int, total_passed: int, total_failed: int) -> float:
+    def ochiai2(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
         """Calculate suspiciousness score using the ochiai2 approach.
 
         Args:

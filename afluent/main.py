@@ -16,6 +16,7 @@ VALID = fx.bold + fg.white + bg.green
 
 CONFLICTING_PLUGINS = ["pytest_cov"]
 
+
 # hook function for pytest to add new command line arguments
 # use argparse to understand (this is the structure)
 def pytest_addoption(parser):
@@ -113,10 +114,10 @@ def pytest_addoption(parser):
         help="Type of tie breaking approach.",
     )
 
+
 # parse the command line arguments
 def pytest_cmdline_main(config):
     """Check if AFLuent is enabled and register the plugin object."""
-
     for plugin in CONFLICTING_PLUGINS:
         if config.pluginmanager.hasplugin(plugin):
             print(
@@ -187,7 +188,7 @@ class Afluent:
             yield # let the test case run even if its parameterized
             self.cov.stop()
             coverage_data = self.cov.get_data() # get the coverage report for the test that just ran
-            #following is restructuring `coverage_data` and storing it in `session_spectrum`
+            # following is restructuring `coverage_data` and storing it in `session_spectrum`
             item_key = f"{pyfuncitem.parent.name}_{pyfuncitem.name}"
             self.session_spectrum[item_key] = {
                 "coverage": {},
@@ -209,7 +210,8 @@ class Afluent:
         outcome = yield # let the test case run to know the result
         item_key = f"{item.parent.name}_{item.name}"
         if outcome.get_result().when == "call" and item_key in self.session_spectrum:
-            self.session_spectrum[item_key]["result"] = outcome.get_result().outcome # update session_spectrum
+            # update session_spectrum
+            self.session_spectrum[item_key]["result"] = outcome.get_result().outcome
 
     def pytest_sessionfinish(self, session, exitstatus):
         """Perform the spectrum analysis if at least one test fails."""

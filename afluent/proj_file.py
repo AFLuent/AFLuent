@@ -18,7 +18,7 @@ class ProjFile:
         self.name = name
         self.lines: Dict[int, line.Line] = {}
         self.cyclomatic_complexity_data: Dict[int, int] = {}
-        self.logical_tiebreak_data: Dict[int, int] = {}  # number of line and the corresponding score
+        self.logical_tiebreak_data: Dict[int, int] = {} # number of line and the corresponding score
         self.enhanced_tiebreak_data: Dict[int, float] = {}
 
     def update_file( #everytime we run a test case we have to update the file

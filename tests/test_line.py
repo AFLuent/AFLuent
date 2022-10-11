@@ -48,7 +48,10 @@ def test_tarantula(
 )
 def test_ohiai(failed_cover, passed_cover, total_failed, expected_score):
     """Check that the ohiai formula is correct."""
-    assert line.Line.ochiai(failed_cover, passed_cover, total_failed) == expected_score
+    assert (
+        line.Line.ochiai(failed_cover, passed_cover, total_failed)
+        == expected_score
+    )
 
 
 @pytest.mark.parametrize(
@@ -87,7 +90,7 @@ def test_ochiai2(
         == expected_score
     )
 
-# New formula
+
 @pytest.mark.parametrize(
     "failed_cover,passed_cover,total_passed,expected_score",
     [
@@ -141,7 +144,10 @@ def test_line_sus_unknown():
 def test_as_csv():
     """Check that a line is correctly converted to csv format."""
     test_line = line.Line("sample/path/to/file.py", 14)
-    assert test_line.as_csv() == ["sample/path/to/file.py", 14, -1, -1, -1, -1, -1]
+    assert (
+        test_line.as_csv()
+        == ["sample/path/to/file.py", 14, -1, -1, -1, -1, -1]
+    )
 
 
 def test_sus_text():

@@ -36,7 +36,8 @@ class Spectrum:
             dstar_pow (int): power to use when calculating scores using dstar
         """
         self.config = config
-        self.reassembled_data: Dict[str, proj_file.ProjFile] = {} #dictionary of names of files that map to a ProjFile
+        # dictionary of names of files that map to a ProjFile
+        self.reassembled_data: Dict[str, proj_file.ProjFile] = {}
         self.sorted_lines: List[line.Line] = []
         self.totals = {"passed": 0, "failed": 0, "skipped": 0}
         self.dstar_pow = dstar_pow
