@@ -7,7 +7,7 @@
 
 ![](./images/afluent_logo2.png)
 
-- [AFLuent](#afluent)
+- [AFLuent](#afluent): A flaky-conscious fault localization Pytest Plugin
   - [Overview](#overview)
   - [Installation](#installation)
   - [Usage](#usage)
