@@ -11,7 +11,7 @@
   - [Overview](#overview)
   - [Installation](#installation)
   - [Usage](#usage)
-    - [Command Line Interface](#command-line-interface)
+  - [Command Line Interface](#command-line-interface)
   - [Warning Messages](#warning-messages)
 
 ## Overview
