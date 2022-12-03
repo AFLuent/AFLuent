@@ -3,12 +3,12 @@
 import math
 from typing import List
 
-# Scores:
+# Scores:   # New Formula
 TARAN = "tarantula"
 OCHIAI = "ochiai"
 OCHIAI2 = "ochiai2"
 DSTAR = "dstar"
-OP2 = "op2"  # New formula
+OP2 = "op2"
 
 
 # Tiebreakers
@@ -36,12 +36,12 @@ class Line:
         ] = []  # List of test functions that ran this Line and passed
         self.failed_by: List[str] = []  # the names of those that failed
         self.skipped_by: List[str] = []
-        self.sus_scores = {  # default values for our formulas
+        self.sus_scores = {  # default values for our formulas # New Formula
             TARAN: -1.0,
             OCHIAI: -1.0,
             DSTAR: -1.0,
             OCHIAI2: -1.0,
-            OP2: -1.0,  # New formula
+            OP2: -1.0,
         }
         self.tiebreakers = {
             CYCLOMATIC: 0.0,
@@ -51,7 +51,7 @@ class Line:
             RANDOM: 0.0,
         }
 
-    def sus(self, method: str, passed_total: int, failed_total: int, power=3):
+    def sus(self, method: str, passed_total: int, failed_total: int, power=3): # New Formula
         """Calculate the suspiciousness score using the passed method.
 
         Args:
@@ -79,7 +79,7 @@ class Line:
                 passed_total,
                 failed_total,
             )
-        elif method.lower() == OP2:  # New formula
+        elif method.lower() == OP2:
             self.sus_scores[OP2] = Line.op2(
                 len(self.failed_by),
                 len(self.passed_by),
@@ -88,7 +88,7 @@ class Line:
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
-    def sus_all(
+    def sus_all( # New Formula
         self, passed_total: int, failed_total: int, power=3
     ):  # use all formulas
         """Calculate the suspiciousness score for all available methods."""
@@ -96,13 +96,13 @@ class Line:
         self.sus(OCHIAI, passed_total, failed_total)
         self.sus(DSTAR, passed_total, failed_total, power=power)
         self.sus(OCHIAI2, passed_total, failed_total)
-        self.sus(OP2, passed_total, failed_total)  # New formula
+        self.sus(OP2, passed_total, failed_total)
 
     def as_dict(self):  # give me the representation of this object as a dictionary
         """Return line information as json writable dictionary."""
         return self.__dict__
 
-    def as_csv(self):  # give me the representation of this object as a csv
+    def as_csv(self):  # give me the representation of this object as a csv # New Formula
         """Return line information as csv writable list."""
         return [
             self.path,
@@ -111,7 +111,7 @@ class Line:
             self.sus_scores[OCHIAI],
             self.sus_scores[OCHIAI2],
             self.sus_scores[DSTAR],
-            self.sus_scores[OP2],  # New formula
+            self.sus_scores[OP2],
         ]
 
     def sus_text(self, methods):
@@ -183,7 +183,7 @@ class Line:
         score = math.pow(failed_cover, power) / (passed_cover + uncovered_failed)
         return round(score, 4)
 
-    # New formula
+    # New Formula
     @staticmethod
     def op2(failed_cover: int, passed_cover: int, total_passed: int) -> float:
         """Calculate suspiciousness score using the op2 approach.

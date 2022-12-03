@@ -11,13 +11,20 @@ from tabulate import tabulate
 from afluent import proj_file, line
 
 
-METHOD_NAMES = [
+METHOD_NAMES = [ # New formula
     "tarantula",
     "ochiai",
     "ochiai2",
     "dstar",
     "op2",
-]  # formula names # New formula
+    "barinel",
+    "jaccarel",
+    "kulczynski",
+    "kulczynski2",
+    "mccon",
+    "minus",
+    "zoltar",
+]  # formula names
 TIEBREAKERS = ["random", "cyclomatic", "logical", "enhanced"]  # tiebreaking approaches
 
 PALETTE = {
@@ -165,14 +172,21 @@ class Spectrum:
             with open("afluent_report.json", "w+", encoding="utf-8") as outfile:
                 json.dump(data_dict, outfile, indent=4)
         elif report_type == "csv":
-            header = [
+            header = [ # New formula
                 "Path",
                 "Line number",
                 "Tarantula Score",
                 "Ochiai Score",
                 "Ochiai2 Score",
                 "Dstar Score",
-                "Op2",  # New formula
+                "Op2 Score",
+                "Barinel Score",
+                "Jaccarel Score",
+                "Kulczynski Score",
+                "Kulczynski2 Score",
+                "McCon Score",
+                "Minus Score",
+                "Zoltar Score",
             ]
             with open("afluent_report.csv", "w+", encoding="utf-8") as outfile:
                 csv_writer = csv.writer(outfile)
@@ -242,7 +256,7 @@ class Spectrum:
         # store the sorted list as an attribute
         return all_lines
 
-    @staticmethod
+    @staticmethod # this may have to be ammended depending on ranges of formulas
     def calculate_severity(method: str, sus_score: float, rank: int, out_of: int):
         """Return a function to format strings according to score severity.
 
@@ -255,8 +269,8 @@ class Spectrum:
         if sus_score <= 0:
             return PALETTE["safe"]
         if (
-            method in ["tarantula", "ochiai", "ochiai2", "op2"]
-        ) and sus_score == 1:  # New formula
+            method in ["tarantula", "ochiai", "ochiai2", "op2", "barinel", "jaccarel", "kulczynski", "kulczynski2", "mccon", "minus", "zoltar"] # New formula
+        ) and sus_score == 1:
             return PALETTE["severe"]
         if method == "dstar" and sus_score == float("inf"):
             return PALETTE["severe"]

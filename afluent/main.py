@@ -30,6 +30,19 @@ def pytest_addoption(parser):
         default=False,
         help="Enable AFLuent",
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
     afluent_group.addoption(
         "--tarantula",
         dest="afl_methods",
@@ -58,6 +71,68 @@ def pytest_addoption(parser):
         const="op2",
         help="Enable fault localization using Op2",
     )
+
+    afluent_group.addoption(  # New formula
+        "--barinel",
+        dest="afl_methods",
+        action="append_const",
+        const="barinel",
+        help="Enable fault localization using Barinel",
+    )
+
+    afluent_group.addoption(  # New formula
+        "--jaccarel",
+        dest="afl_methods",
+        action="append_const",
+        const="jaccarel",
+        help="Enable fault localization using Jaccarel",
+    )
+
+    afluent_group.addoption(  # New formula
+        "--kulczynski",
+        dest="afl_methods",
+        action="append_const",
+        const="kulczynski",
+        help="Enable fault localization using Kulczynski",
+    )
+
+    afluent_group.addoption(  # New formula
+        "--kulczynski2",
+        dest="afl_methods",
+        action="append_const",
+        const="kulczynski2",
+        help="Enable fault localization using Kulczynski2",
+    )
+
+    afluent_group.addoption(  # New formula
+        "--mccon",
+        dest="afl_methods",
+        action="append_const",
+        const="mccon",
+        help="Enable fault localization using McCon",
+    )
+
+    afluent_group.addoption(  # New formula
+        "--minus",
+        dest="afl_methods",
+        action="append_const",
+        const="minus",
+        help="Enable fault localization using Minus",
+    )
+
+    afluent_group.addoption(  # New formula
+        "--zoltar",
+        dest="afl_methods",
+        action="append_const",
+        const="zoltar",
+        help="Enable fault localization using Zoltar",
+    )
+
+
+
+
+
+
     afluent_group.addoption(
         "--dstar",
         dest="afl_methods",
@@ -73,6 +148,29 @@ def pytest_addoption(parser):
         type=int,
         help="Power to use when calculating Dstar score, default to 3",
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     afluent_group.addoption(
         "--afl-results",
         dest="results_num",
