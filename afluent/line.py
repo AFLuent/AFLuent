@@ -9,6 +9,13 @@ OCHIAI = "ochiai"
 OCHIAI2 = "ochiai2"
 DSTAR = "dstar"
 OP2 = "op2"
+BARINEL = "barinel"
+JACCARD = "jaccard"
+KULCZYNSKI = "kulczynski"
+KULCZYNSKI2 = "kulczynski2"
+MCCON = "mccon"
+MINUS = "minus"
+ZOLTAR = "zoltar"
 
 
 # Tiebreakers
@@ -42,6 +49,13 @@ class Line:
             DSTAR: -1.0,
             OCHIAI2: -1.0,
             OP2: -1.0,
+            BARINEL: -1.0,
+            JACCARD: -1.0,
+            KULCZYNSKI: -1.0,
+            KULCZYNSKI2: -1.0,
+            MCCON: -1.0,
+            MINUS: -1.0,
+            ZOLTAR: -1.0,
         }
         self.tiebreakers = {
             CYCLOMATIC: 0.0,
@@ -85,6 +99,55 @@ class Line:
                 len(self.passed_by),
                 passed_total,
             )
+        elif method.lower() == BARINEL:
+            self.sus_scores[BARINEL] = Line.barinel(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
+        elif method.lower() == JACCARD:
+            self.sus_scores[JACCARD] = Line.jaccard(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
+        elif method.lower() == KULCZYNSKI:
+            self.sus_scores[KULCZYNSKI] = Line.kulczynski(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
+        elif method.lower() == KULCZYNSKI2:
+            self.sus_scores[KULCZYNSKI2] = Line.kulczynski2(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
+        elif method.lower() == MCCON:
+            self.sus_scores[MCCON] = Line.mccon(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
+        elif method.lower() == MINUS:
+            self.sus_scores[MINUS] = Line.minus(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
+        elif method.lower() == ZOLTAR:
+            self.sus_scores[ZOLTAR] = Line.zoltar(
+                len(self.failed_by),
+                len(self.passed_by),
+                passed_total,
+                failed_total,
+            )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
@@ -97,6 +160,13 @@ class Line:
         self.sus(DSTAR, passed_total, failed_total, power=power)
         self.sus(OCHIAI2, passed_total, failed_total)
         self.sus(OP2, passed_total, failed_total)
+        self.sus(BARINEL, passed_total, failed_total)
+        self.sus(JACCARD, passed_total, failed_total)
+        self.sus(KULCZYNSKI, passed_total, failed_total)
+        self.sus(KULCZYNSKI2, passed_total, failed_total)
+        self.sus(MCCON, passed_total, failed_total)
+        self.sus(MINUS, passed_total, failed_total)
+        self.sus(ZOLTAR, passed_total, failed_total)
 
     def as_dict(self):  # give me the representation of this object as a dictionary
         """Return line information as json writable dictionary."""
@@ -112,6 +182,13 @@ class Line:
             self.sus_scores[OCHIAI2],
             self.sus_scores[DSTAR],
             self.sus_scores[OP2],
+            self.sus_scores[BARINEL],
+            self.sus_scores[JACCARD],
+            self.sus_scores[KULCZYNSKI],
+            self.sus_scores[KULCZYNSKI2],
+            self.sus_scores[MCCON],
+            self.sus_scores[MINUS],
+            self.sus_scores[ZOLTAR],
         ]
 
     def sus_text(self, methods):
@@ -199,7 +276,7 @@ class Line:
         score = failed_cover - (passed_cover / (total_passed + 1))
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def barinel(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
@@ -220,7 +297,7 @@ class Line:
 
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def jaccard(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
@@ -242,7 +319,7 @@ class Line:
 
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def kulczynski(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
@@ -264,7 +341,7 @@ class Line:
 
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def kulczynski2(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
@@ -286,7 +363,7 @@ class Line:
 
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def mccon(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
@@ -308,7 +385,7 @@ class Line:
 
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def minus(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
@@ -331,7 +408,7 @@ class Line:
 
         return round(score, 4)
 
-    # New Forumla
+    # New Formula
     @staticmethod
     def zoltar(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int

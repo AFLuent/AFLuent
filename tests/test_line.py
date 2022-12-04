@@ -5,13 +5,20 @@ import pytest
 from afluent import line
 
 
-def test_globals():
+def test_globals():   # New Formula
     """Check that global constants are of specific values."""
     assert line.TARAN == "tarantula"
     assert line.OCHIAI == "ochiai"
     assert line.OCHIAI2 == "ochiai2"
     assert line.DSTAR == "dstar"
-    assert line.OP2 == "op2"  # New formula
+    assert line.OP2 == "op2"
+    assert line.BARINEL == "barinel"
+    assert line.JACCARD == "jaccard"
+    assert line.KULCZYNSKI == "kulczynski"
+    assert line.KULCZYNSKI2 == "kulczynski2"
+    assert line.MCCON == "mccon"
+    assert line.MINUS == "minus"
+    assert line.ZOLTAR == "zoltar"
     assert line.RANDOM == "random"
     assert line.CYCLOMATIC == "cyclomatic"
     assert line.LOGICAL == "logical"
