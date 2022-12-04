@@ -18,7 +18,7 @@ METHOD_NAMES = [ # New formula
     "dstar",
     "op2",
     "barinel",
-    "jaccarel",
+    "jaccard",
     "kulczynski",
     "kulczynski2",
     "mccon",
@@ -181,7 +181,7 @@ class Spectrum:
                 "Dstar Score",
                 "Op2 Score",
                 "Barinel Score",
-                "Jaccarel Score",
+                "Jaccard Score",
                 "Kulczynski Score",
                 "Kulczynski2 Score",
                 "McCon Score",
@@ -269,7 +269,7 @@ class Spectrum:
         if sus_score <= 0:
             return PALETTE["safe"]
         if (
-            method in ["tarantula", "ochiai", "ochiai2", "op2", "barinel", "jaccarel", "kulczynski", "kulczynski2", "mccon", "minus", "zoltar"] # New formula
+            method in ["tarantula", "ochiai", "ochiai2", "op2", "barinel", "jaccard", "kulczynski", "kulczynski2", "mccon", "minus", "zoltar"] # New formula
         ) and sus_score == 1:
             return PALETTE["severe"]
         if method == "dstar" and sus_score == float("inf"):

@@ -81,11 +81,11 @@ def pytest_addoption(parser):
     )
 
     afluent_group.addoption(  # New formula
-        "--jaccarel",
+        "--jaccard",
         dest="afl_methods",
         action="append_const",
-        const="jaccarel",
-        help="Enable fault localization using Jaccarel",
+        const="jaccard",
+        help="Enable fault localization using Jaccard",
     )
 
     afluent_group.addoption(  # New formula
