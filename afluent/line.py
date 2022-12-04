@@ -331,6 +331,29 @@ class Line:
 
         return round(score, 4)
 
+    # New Forumla
+    @staticmethod
+    def zoltar(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
+        """Calculate suspiciousness score using the Zoltar approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+            total_failed (int): total number of failed test cases
+
+        Returns:
+            float: suspiciousness score using Zoltar
+        """
+        #check
+        nf = total_failed - failed_cover
+        np = total_passed - passed_cover
+        score = failed_cover / (failed_cover + nf + passed_cover + 10000 * nf * passed_cover / failed_cover)
+
+        return round(score, 4)
+
     @staticmethod
     def ochiai2(
         failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
