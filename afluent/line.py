@@ -237,7 +237,97 @@ class Line:
             float: suspiciousness score using Jaccard
         """
         #check
-        score = failed_cover / (failed_cover + passed_cover + total_failed - failed_cover)
+        nf = total_failed - failed_cover
+        score = failed_cover / (failed_cover + passed_cover + nf)
+
+        return round(score, 4)
+
+    # New Forumla
+    @staticmethod
+    def kulczynski(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
+        """Calculate suspiciousness score using the Kulczynski approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+            total_failed (int): total number of failed test cases
+
+        Returns:
+            float: suspiciousness score using Kulczynski
+        """
+        #check
+        nf = total_failed - failed_cover
+        score = failed_cover / (passed_cover + nf)
+
+        return round(score, 4)
+
+    # New Forumla
+    @staticmethod
+    def kulczynski2(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
+        """Calculate suspiciousness score using the Kulczynski2 approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+            total_failed (int): total number of failed test cases
+
+        Returns:
+            float: suspiciousness score using Kulczynski2
+        """
+        #check
+        nf = total_failed - failed_cover
+        score = 0.5 * (failed_cover / (failed_cover + nf) + failed_cover / (failed_cover + passed_cover))
+
+        return round(score, 4)
+
+    # New Forumla
+    @staticmethod
+    def mccon(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
+        """Calculate suspiciousness score using the McCon approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+            total_failed (int): total number of failed test cases
+
+        Returns:
+            float: suspiciousness score using McCon
+        """
+        #check
+        nf = total_failed - failed_cover
+        score = (failed_cover * failed_cover - (total_failed - failed_cover) * passed_cover) / ((failed_cover + nf) * (failed_cover + passed_cover))
+
+        return round(score, 4)
+
+    # New Forumla
+    @staticmethod
+    def minus(
+        failed_cover: int, passed_cover: int, total_passed: int, total_failed: int
+    ) -> float:
+        """Calculate suspiciousness score using the Minus approach.
+
+        Args:
+            failed_cover (int): total number of failed test cases that cover the line
+            passed_cover (int): total number of passed test cases that cover the line
+            total_passed (int): total number of passed test cases
+            total_failed (int): total number of failed test cases
+
+        Returns:
+            float: suspiciousness score using Minus
+        """
+        #check
+        nf = total_failed - failed_cover
+        np = total_passed - passed_cover
+        score = ((failed_cover / (failed_cover + nf)) / ((failed_cover / (failed_cover + nf)) + (passed_cover / (passed_cover + np)))) - ((1 - failed_cover / (failed_cover + nf)) / (1 - failed_cover / (failed_cover + nf) + 1 - passed_cover / (passed_cover + np)))
 
         return round(score, 4)
 
