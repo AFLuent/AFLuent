@@ -424,8 +424,6 @@ class Line:
         Returns:
             float: suspiciousness score using Zoltar
         """
-        if failed_cover == 0:
-            return 0
         #check
         nf = total_failed - failed_cover
         np = total_passed - passed_cover
