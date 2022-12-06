@@ -340,8 +340,13 @@ class Line:
         Returns:
             float: suspiciousness score using Kulczynski
         """
+
         #check
         nf = total_failed - failed_cover
+
+        if passed_cover + nf == 0:
+            return 0
+
         score = failed_cover / (passed_cover + nf)
 
         return round(score, 4)
@@ -364,6 +369,12 @@ class Line:
         """
         #check
         nf = total_failed - failed_cover
+
+        if failed_cover + nf == 0:
+            return 0
+        if passed_cover + failed_cover == 0:
+            return 0
+
         score = 0.5 * (failed_cover / (failed_cover + nf) + failed_cover / (failed_cover + passed_cover))
 
         return round(score, 4)
@@ -386,6 +397,12 @@ class Line:
         """
         #check
         nf = total_failed - failed_cover
+
+        if failed_cover + nf == 0:
+            return -1
+        if failed_cover + passed_cover == 0:
+            return -1
+
         score = (failed_cover * failed_cover - (total_failed - failed_cover) * passed_cover) / ((failed_cover + nf) * (failed_cover + passed_cover))
 
         return round(score, 4)
@@ -409,6 +426,18 @@ class Line:
         #check
         nf = total_failed - failed_cover
         np = total_passed - passed_cover
+
+        if failed_cover + nf == 0:
+            return -1
+        if passed_cover + np == 0:
+            return 1
+
+        if ((failed_cover / (failed_cover + nf)) + (passed_cover / (passed_cover + np))) == 0:
+            return 0
+
+        if (1 - failed_cover / (failed_cover + nf) + 1 - passed_cover / (passed_cover + np)) == 0:
+            return 0
+
         score = ((failed_cover / (failed_cover + nf)) / ((failed_cover / (failed_cover + nf)) + (passed_cover / (passed_cover + np)))) - ((1 - failed_cover / (failed_cover + nf)) / (1 - failed_cover / (failed_cover + nf) + 1 - passed_cover / (passed_cover + np)))
 
         return round(score, 4)

@@ -334,7 +334,16 @@ class Spectrum:
         if method == "dstar" and sus_score == float("inf"):
             return PALETTE["severe"]
 
+        if method == "dstar" and sus_score <= 0:
+            return PALETTE["safe"]
+
+        
+
+
+
         if rank / out_of <= 0.2:
             return PALETTE["risky"]
+
+
 
         return PALETTE["mild"]

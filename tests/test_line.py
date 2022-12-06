@@ -447,7 +447,7 @@ def test_line_create():
         -1,
         -1,
         -1,
-        -1,
+        # -1,
     ]  # New formula
     assert list(test_line.tiebreakers.values()) == [0, 0, 0, 0]
 
@@ -477,7 +477,7 @@ def test_line_sus_unknown():
 def test_as_csv():
     """Check that a line is correctly converted to csv format."""
     test_line = line.Line("sample/path/to/file.py", 14)
-    assert test_line.as_csv() == ["sample/path/to/file.py", 14, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    assert test_line.as_csv() == ["sample/path/to/file.py", 14, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
 
 
 def test_sus_text():
