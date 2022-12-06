@@ -67,8 +67,14 @@ command.
 - `--ochiai`: calculate suspiciousness scores using the Ochiai equation
 - `--ochiai2`: calculate suspiciousness scores using the Ochiai2 equation
 - `--dstar`: calculate suspiciousness scores using the DStar equation
-- `--op2`: calculate suspiciousness scores using the Op2 equation
 - `--dstar-pow`: value of `*` to use the the DStar equation, defaults to 3
+- `--op2`: calculate suspiciousness scores using the Op2 equation
+- `--barinel`: calculate suspiciousness scores using the Barinel equation
+- `--jaccard`: calculate suspiciousness scores using the Jaccard equation
+- `--Kulczynski`: calculate suspiciousness scores using the Kulczynski equation
+- `--Kulczynski2`: calculate suspiciousness scores using the Kulczynski2 equation
+- `--mccon`: calculate suspiciousness scores using the McCon equation
+- `--minus`: calculate suspiciousness scores using the Minus equation
 - `--tiebreaker`: Approach to use when resolving ties between statements.
   Options: `random`, `cyclomatic`, `logical`, or `enhanced`. Defaults to `random`.
 - `--report`: type of report to produce following AFLuent's run. Options: `json`
