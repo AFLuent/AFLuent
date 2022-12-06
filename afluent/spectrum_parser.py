@@ -266,14 +266,75 @@ class Spectrum:
             rank (int): the rank of this line in the sorted list
             out_of (int): length of the sorted list
         """
-        if sus_score <= 0:
-            return PALETTE["safe"]
+        # if sus_score <= 0:
+        #     return PALETTE["safe"]
+
         if (
-            method in ["tarantula", "ochiai", "ochiai2", "op2", "barinel", "jaccard", "kulczynski", "kulczynski2", "mccon", "minus", "zoltar"] # New formula
+            method in ["tarantula", "ochiai", "ochiai2", "barinel", "jaccard", "kulczynski2"] # New formula
         ) and sus_score == 1:
             return PALETTE["severe"]
+
+        if (
+            method in ["tarantula", "ochiai", "ochiai2", "barinel", "jaccard", "kulczynski2, op2"] # New formula
+        ) and sus_score == 0:
+            return PALETTE["safe"]
+
+
+
+
+
+        if (
+            method in ["op2"] # New formula
+        ) and sus_score > 1.3:
+            return PALETTE["severe"]
+
+        if (
+            method in ["op2"] # New formula
+        ) and sus_score < 1.3 and sus_score >= 1.0:
+            return PALETTE["risky"]
+
+        if (
+            method in ["op2"] # New formula
+        ) and sus_score >= 0.3 and sus_score < 1.0:
+            return PALETTE["mild"]
+
+        if (
+            method in ["op2"] # New formula
+        ) and sus_score < 0.3 and sus_score > 0:
+            return PALETTE["safe"]
+
+
+
+
+
+        if (
+            method in ["mccon", "minus"] # New formula
+        ) and sus_score == 1:
+            return PALETTE["severe"]
+
+        if (
+            method in ["mccon", "minus"] # New formula
+        ) and sus_score > 0 and sus_score < 1:
+            return PALETTE["risky"]
+
+        if (
+            method in ["mccon", "minus"] # New formula
+        ) and sus_score < 0 and sus_score > -1:
+            return PALETTE["mild"]
+
+        if (
+            method in ["mccon", "minus"] # New formula
+        ) and sus_score == -1:
+            return PALETTE["safe"]
+
+
+
+
+
         if method == "dstar" and sus_score == float("inf"):
             return PALETTE["severe"]
+
         if rank / out_of <= 0.2:
             return PALETTE["risky"]
+
         return PALETTE["mild"]
