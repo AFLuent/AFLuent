@@ -15,7 +15,7 @@ KULCZYNSKI = "kulczynski"
 KULCZYNSKI2 = "kulczynski2"
 MCCON = "mccon"
 MINUS = "minus"
-ZOLTAR = "zoltar"
+# ZOLTAR = "zoltar"
 
 
 # Tiebreakers
@@ -55,7 +55,7 @@ class Line:
             KULCZYNSKI2: -1.0,
             MCCON: -1.0,
             MINUS: -1.0,
-            ZOLTAR: -1.0,
+            # ZOLTAR: -1.0,
         }
         self.tiebreakers = {
             CYCLOMATIC: 0.0,
@@ -141,13 +141,13 @@ class Line:
                 passed_total,
                 failed_total,
             )
-        elif method.lower() == ZOLTAR:
-            self.sus_scores[ZOLTAR] = Line.zoltar(
-                len(self.failed_by),
-                len(self.passed_by),
-                passed_total,
-                failed_total,
-            )
+        # elif method.lower() == ZOLTAR:
+        #     self.sus_scores[ZOLTAR] = Line.zoltar(
+        #         len(self.failed_by),
+        #         len(self.passed_by),
+        #         passed_total,
+        #         failed_total,
+        #     )
         else:
             raise Exception("ERROR: unknown suspiciousness method")
 
@@ -166,7 +166,7 @@ class Line:
         self.sus(KULCZYNSKI2, passed_total, failed_total)
         self.sus(MCCON, passed_total, failed_total)
         self.sus(MINUS, passed_total, failed_total)
-        self.sus(ZOLTAR, passed_total, failed_total)
+        # self.sus(ZOLTAR, passed_total, failed_total)
 
     def as_dict(self):  # give me the representation of this object as a dictionary
         """Return line information as json writable dictionary."""
@@ -188,7 +188,7 @@ class Line:
             self.sus_scores[KULCZYNSKI2],
             self.sus_scores[MCCON],
             self.sus_scores[MINUS],
-            self.sus_scores[ZOLTAR],
+            # self.sus_scores[ZOLTAR],
         ]
 
     def sus_text(self, methods):

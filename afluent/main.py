@@ -120,13 +120,13 @@ def pytest_addoption(parser):
         help="Enable fault localization using Minus",
     )
 
-    afluent_group.addoption(  # New formula
-        "--zoltar",
-        dest="afl_methods",
-        action="append_const",
-        const="zoltar",
-        help="Enable fault localization using Zoltar",
-    )
+    # afluent_group.addoption(  # New formula
+    #     "--zoltar",
+    #     dest="afl_methods",
+    #     action="append_const",
+    #     const="zoltar",
+    #     help="Enable fault localization using Zoltar",
+    # )
 
 
 

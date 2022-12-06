@@ -23,7 +23,7 @@ METHOD_NAMES = [ # New formula
     "kulczynski2",
     "mccon",
     "minus",
-    "zoltar",
+    # "zoltar",
 ]  # formula names
 TIEBREAKERS = ["random", "cyclomatic", "logical", "enhanced"]  # tiebreaking approaches
 
@@ -186,7 +186,7 @@ class Spectrum:
                 "Kulczynski2 Score",
                 "McCon Score",
                 "Minus Score",
-                "Zoltar Score",
+                # "Zoltar Score",
             ]
             with open("afluent_report.csv", "w+", encoding="utf-8") as outfile:
                 csv_writer = csv.writer(outfile)
