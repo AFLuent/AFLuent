@@ -98,6 +98,7 @@ class Line:
                 len(self.failed_by),
                 len(self.passed_by),
                 passed_total,
+                failed_total,
             )
         elif method.lower() == BARINEL:
             self.sus_scores[BARINEL] = Line.barinel(
@@ -262,7 +263,7 @@ class Line:
 
     # New Formula
     @staticmethod
-    def op2(failed_cover: int, passed_cover: int, total_passed: int) -> float:
+    def op2(failed_cover: int, passed_cover: int, total_passed: int, total_failed: int) -> float:
         """Calculate suspiciousness score using the op2 approach.
 
         Args:

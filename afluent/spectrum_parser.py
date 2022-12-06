@@ -300,7 +300,7 @@ class Spectrum:
 
         if (
             method in ["op2"] # New formula
-        ) and sus_score < 0.3 and sus_score > 0:
+        ) and sus_score < 0.3:
             return PALETTE["safe"]
 
 
@@ -337,7 +337,7 @@ class Spectrum:
         if method == "dstar" and sus_score <= 0:
             return PALETTE["safe"]
 
-        
+
 
 
 

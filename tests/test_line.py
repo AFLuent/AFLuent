@@ -415,18 +415,39 @@ def test_ochiai2(
 
 
 @pytest.mark.parametrize(
-    "failed_cover,passed_cover,total_passed,expected_score",
+    "failed_cover,passed_cover,total_passed,total_failed,expected_score",
     [
-        (2, 2, 1, 1),
-        (1, 1, 0, 0),
-        (5, 2, 4, 4.6),
-        (8, 6, 2, 6),
-        (7, 0, 4, 7),
+        (15, 7, 7, 18, 14.1250),
+        (21, 5, 15, 41, 20.6875),
+        (1, 2, 5, 25, 0.6667),
+        (8, 9, 18, 29, 7.5263),
+        (5, 5, 11, 18, 4.5833),
+        (9, 15, 36, 23, 8.5946),
+        (7, 23, 32, 15, 6.3030),
+        (3, 12, 28, 8, 2.5862),
+        (3, 11, 30, 10, 2.6452),
+        (11, 0, 14, 31, 11.0000),
+        (20, 24, 24, 31, 19.0400),
+        (11, 9, 31, 24, 10.7188),
+        (6, 1, 24, 11, 5.9600),
+        (10, 3, 4, 33, 9.4000),
+        (5, 1, 9, 19, 4.9000),
+        (13, 18, 39, 16, 12.5500),
+        (15, 18, 19, 15, 14.1000),
+        (0, 7, 18, 15, -0.3684),
+        (8, 23, 44, 28, 7.4889),
+        (13, 8, 11, 23, 12.3333),
+        (22, 2, 24, 45, 21.9200),
+        (10, 2, 16, 30, 9.8824),
+        (22, 6, 9, 37, 21.4000),
+        (23, 0, 2, 24, 23.0000),
+        (1, 16, 20, 1, 0.2381),
+        (16, 1, 22, 36, 15.9565),
     ],
 )
-def test_op2(failed_cover, passed_cover, total_passed, expected_score):
+def test_op2(failed_cover, passed_cover, total_passed, total_failed, expected_score):
     """Check that the op2 formula is correct."""
-    assert line.Line.op2(failed_cover, passed_cover, total_passed) == expected_score
+    assert line.Line.op2(failed_cover, passed_cover, total_passed, total_failed) == expected_score
 
 
 def test_line_create():
