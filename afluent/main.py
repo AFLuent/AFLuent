@@ -266,6 +266,13 @@ class Afluent:
                 "ochiai",
                 "ochiai2",
                 "op2",
+                "barinel",
+                "jaccard",
+                "kulczynski",
+                "kulczynski2",
+                "mccon",
+                "minus",
+                # "zoltar",
             ]  # New formula
         self.dstar_pow = pytest_config.getoption("dstar_pow")
         self.results_num = pytest_config.getoption("results_num")
